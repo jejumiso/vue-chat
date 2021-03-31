@@ -5,9 +5,7 @@
 			<ul v-if="postItems">
 				<li v-for="item in postItems" :key="item._id">
 					<div class="post-title">
-						<router-link :to="`/post/${item._id}`">{{
-							item.title
-						}}</router-link>
+						<router-link :to="`/post/${item._id}`">{{ item.title }}</router-link>
 					</div>
 					<div class="post-contents">
 						{{ item.contents }}

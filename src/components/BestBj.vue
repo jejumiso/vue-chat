@@ -5,7 +5,7 @@
 			<div v-for="item in BjRakingList" :key="item.memberId">
 				<!-- {{ item.photo_title }} -->
 				<div style="border-radius: 50%;">
-					<img :src="item.photo_title" style="width: 250px;height: 250px;object-fit: fill;" />
+					<img :src="item.photo_title" style="width: 500px;height: 250px;object-fit: fill;" />
 				</div>
 			</div>
 		</VueTinySlider>
@@ -30,7 +30,7 @@ export default {
 			tinySliderOptions: {
 				mouseDrag: true,
 				loop: false,
-				items: 1,
+				items: 2,
 				swipeAngle: 45,
 				nav: false, //네비 없애기
 				controls: false, //컨트롤(앞으로,뒤로) 없애기
