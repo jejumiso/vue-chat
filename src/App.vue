@@ -2,7 +2,6 @@
 	<div class="app">
 		<div style="width:1200px;">
 			<AppHeader></AppHeader>
-			<BestBj></BestBj>
 			<div class="app-contents">
 				<router-view></router-view>
 			</div>
@@ -15,7 +14,6 @@
 <script>
 import AppHeader from './components/common/AppHeader.vue';
 import AppFooter from './components/common/AppFooter.vue';
-import BestBj from './components/BestBj.vue';
 import ToastPopup from './components/common/ToastPopup.vue';
 
 export default {
@@ -26,7 +24,6 @@ export default {
 		AppHeader,
 		ToastPopup,
 		AppFooter,
-		BestBj,
 	},
 };
 </script>

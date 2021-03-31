@@ -15,3 +15,5 @@ function createWithAuth(url, options) {
 
 export const auth = create(process.env.VUE_APP_API_URL);
 export const posts = createWithAuth(`${process.env.VUE_APP_API_URL}posts/`);
+
+export const commonNotAuth = create(process.env.VUE_APP_API_URL);

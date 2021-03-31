@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import LoginView from '../views/LoginView';
 import SignupView from '../views/SignupView';
 import MainView from '../views/MainView';
+import MainView2 from '../views/MainView2';
 import PostAddView from '../views/PostAddView';
 import PostDetailView from '../views/PostDetailView';
 import store from '../store';
@@ -15,7 +16,7 @@ export default new Router({
 	routes: [
 		{
 			path: '/',
-			redirect: '/login',
+			redirect: '/main2',
 		},
 		{
 			path: '/login',
@@ -35,6 +36,11 @@ export default new Router({
 			name: 'main',
 			component: MainView,
 			beforeEnter,
+		},
+		{
+			path: '/main2',
+			name: 'main2',
+			component: MainView2,
 		},
 		{
 			path: '/new',
