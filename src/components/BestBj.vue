@@ -4,7 +4,7 @@
 			<div style="width:5px;padding:0;margin:0"></div>
 			<div v-for="item in BjRakingList" :key="item.memberId">
 				<!-- {{ item.photo_title }} -->
-				<div style="width:100%;height:250px">
+				<div>
 					<img :src="item.photo_title" style="width:100%;height:100%;object-fit:cover;" />
 				</div>
 			</div>
@@ -34,7 +34,7 @@ export default {
 				swipeAngle: 45,
 				nav: false, //네비 없애기
 				controls: false, //컨트롤(앞으로,뒤로) 없애기
-				gutter: 20, //슬라이드 사이의 공간(px)
+				gutter: 25, //슬라이드 사이의 공간(px)
 			},
 			BjRakingList: null,
 		};
