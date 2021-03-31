@@ -30,7 +30,7 @@ export default {
 			tinySliderOptions: {
 				mouseDrag: true,
 				loop: false,
-				items: 6,
+				items: 1,
 				swipeAngle: 45,
 				nav: false, //네비 없애기
 				controls: false, //컨트롤(앞으로,뒤로) 없애기
