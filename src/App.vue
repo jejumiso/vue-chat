@@ -1,6 +1,6 @@
 <template>
 	<div class="app">
-		<div style="width:100%;max-width:1200px;min-width:600px">
+		<div id="content" style="width:100%;max-width:1200px;min-width:600px">
 			<AppHeader></AppHeader>
 			<div class="app-contents">
 				<router-view></router-view>
