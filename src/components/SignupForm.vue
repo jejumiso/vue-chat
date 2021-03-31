@@ -5,12 +5,7 @@
 			<form @submit.prevent="registerUser" class="form">
 				<div>
 					<label for="username">ID</label>
-					<input
-						type="text"
-						id="username"
-						v-model="username"
-						:class="usernameValidClass"
-					/>
+					<input type="text" id="username" v-model="username" :class="usernameValidClass" />
 					<p class="validation-text">
 						<span class="warning" v-if="!isUsernameValid">
 							Please enter an email address
@@ -19,12 +14,7 @@
 				</div>
 				<div>
 					<label for="password">PW</label>
-					<input
-						type="password"
-						id="password"
-						v-model="password"
-						:class="passwordValidClass"
-					/>
+					<input type="password" id="password" v-model="password" :class="passwordValidClass" />
 					<p class="validation-text">
 						<span class="warning" v-if="!isPasswordValid">
 							Password must be over 8 letters
@@ -33,19 +23,9 @@
 				</div>
 				<div>
 					<label for="nickname">Nickname</label>
-					<input
-						type="text"
-						id="nickname"
-						v-model="nickname"
-						:class="nicknameValidClass"
-					/>
+					<input type="text" id="nickname" v-model="nickname" :class="nicknameValidClass" />
 				</div>
-				<button
-					type="submit"
-					class="btn"
-					:class="isButtonDisabled"
-					:disabled="isButtonDisabled"
-				>
+				<button type="submit" class="btn" :class="isButtonDisabled" :disabled="isButtonDisabled">
 					Create
 				</button>
 			</form>
@@ -102,13 +82,7 @@ export default {
 			return this.nickname ? 'valid' : null;
 		},
 		isButtonDisabled() {
-			return !this.username ||
-				!this.password ||
-				!this.nickname ||
-				!validateEmail(this.username) ||
-				!validatePassword(this.password)
-				? 'disabled'
-				: null;
+			return !this.username || !this.password || !this.nickname || !validateEmail(this.username) || !validatePassword(this.password) ? 'disabled' : null;
 		},
 	},
 	methods: {
