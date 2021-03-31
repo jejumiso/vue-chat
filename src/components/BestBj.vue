@@ -4,7 +4,7 @@
 			<div style="width:5px;padding:0;margin:0"></div>
 			<div v-for="item in BjRakingList" :key="item.memberId">
 				<!-- {{ item.photo_title }} -->
-				<div>
+				<div class="">
 					<img :src="item.photo_title" style="width:100%;height:100%;object-fit:cover;" />
 				</div>
 			</div>
