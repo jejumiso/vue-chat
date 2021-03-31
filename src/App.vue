@@ -28,6 +28,9 @@ export default {
 		AppFooter,
 		BestBj,
 	},
+	mounted() {
+		// console.log(this.$firebase);
+	},
 };
 </script>
 
