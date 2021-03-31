@@ -1,10 +1,6 @@
 <template>
 	<footer>
-		<a
-			href="https://github.com/joshua1988/vue-til/tree/complete"
-			target="_blank"
-			>View GitHub source</a
-		>
+		<a href="https://github.com/joshua1988/vue-til/tree/complete" target="_blank">View GitHub source</a>
 		<div>© 2019 Captain Pangyo</div>
 	</footer>
 </template>

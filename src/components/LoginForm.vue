@@ -4,7 +4,7 @@
 			<PageHeader>Login</PageHeader>
 			<form @submit.prevent="submitForm" class="form">
 				<div>
-					<label for="username">ID</label>
+					<label for="nickname">ID</label>
 					<input type="text" id="nickname" v-model="nickname" />
 				</div>
 				<div>
@@ -59,21 +59,26 @@ export default {
 	},
 	methods: {
 		async submitForm() {
-			if (!this.username || !this.password) {
+			if (!this.nickname || !this.password) {
 				alert('Fill in the account information');
 				return;
 			}
 			try {
 				const response = await this.$store.dispatch('LOGIN', {
-					username: this.username,
+					nickname: this.nickname,
 					password: this.password,
 				});
-				console.log(response);
-				bus.$emit('show:toast', response.data.message);
-				this.$router.push('/main');
-				this.initForm();
+				if (response.data !== '') {
+					console.log(response);
+					console.log('LoginFrom - response : ' + response);
+					bus.$emit('show:toast', response.data.nickname + ' 로그인 되었습니다.');
+					this.$router.push('/main2');
+					this.initForm();
+				} else {
+					bus.$emit('show:toast', '등록된 사용자가 없습니다.');
+				}
 			} catch (error) {
-				console.log(error);
+				console.log('에러 : ' + error);
 				this.logMessage = error.response.data;
 			}
 		},

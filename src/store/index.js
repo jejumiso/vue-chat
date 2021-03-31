@@ -1,12 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { loginUser } from '@/api/auth';
-import {
-	saveAuthToCookie,
-	saveUserToCookie,
-	getUserFromCookie,
-	deleteCookie,
-} from '@/utils/cookies.js';
+import { saveAuthToCookie, saveUserToCookie, getUserFromCookie, deleteCookie } from '@/utils/cookies.js';
 
 Vue.use(Vuex);
 
@@ -26,6 +21,7 @@ export default new Vuex.Store({
 	mutations: {
 		SET_USER(state, user) {
 			state.user = user;
+			console.log('state.user : ');
 		},
 		SET_TOKEN(state, token) {
 			state.token = token;
@@ -35,16 +31,25 @@ export default new Vuex.Store({
 			state.token = null;
 			deleteCookie('til_auth');
 			deleteCookie('til_user');
+			console.log('로그아웃');
 		},
 	},
 	actions: {
 		async LOGIN({ commit }, data) {
 			const response = await loginUser(data);
-			commit('SET_USER', response.data.user);
-			commit('SET_TOKEN', response.data.token);
-			saveUserToCookie(response.data.user.username);
-			saveAuthToCookie(response.data.token);
-			return response;
+			if (response.data != '') {
+				console.log(response.data.nickname);
+				console.log('end');
+				// commit('SET_USER', response.data.user);
+				//commit('SET_TOKEN', response.data.token);
+				commit('SET_USER', response.data);
+				commit('SET_TOKEN', response.data.nickname);
+				saveUserToCookie(response.data.nickname);
+				saveAuthToCookie(response.data.nickname);
+				return response;
+			} else {
+				return response;
+			}
 		},
 	},
 });

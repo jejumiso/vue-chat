@@ -37,9 +37,9 @@ export default {
 	},
 	methods: {
 		logout() {
-			bus.$emit('show:toast', 'User logged out');
+			bus.$emit('show:toast', '로그아웃.');
 			this.$store.commit('LOGOUT');
-			this.$router.push('/');
+			// this.$router.push('/');
 		},
 		checkHeight() {
 			window.scrollY > 5 ? this.stickHeader() : this.looseHeader();
