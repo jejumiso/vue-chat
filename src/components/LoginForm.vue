@@ -5,7 +5,7 @@
 			<form @submit.prevent="submitForm" class="form">
 				<div>
 					<label for="username">ID</label>
-					<input type="text" id="username" v-model="username" />
+					<input type="text" id="nickname" v-model="nickname" />
 				</div>
 				<div>
 					<label for="password">PW</label>
@@ -13,6 +13,27 @@
 				</div>
 				<button class="btn">login</button>
 			</form>
+			<div style="margin:10px 0">
+				<button
+					class="btn"
+					@click="
+						nickname = 'bj_1';
+						password = '1234';
+					"
+				>
+					bj
+				</button>
+				&nbsp;
+				<button
+					class="btn"
+					@click="
+						nickname = 'member_1';
+						password = '1234';
+					"
+				>
+					member
+				</button>
+			</div>
 			<p class="log">
 				{{ logMessage }}
 			</p>
@@ -31,6 +52,7 @@ export default {
 	data() {
 		return {
 			username: '',
+			nickname: '',
 			password: '',
 			logMessage: '',
 		};

@@ -6,6 +6,7 @@ function loginUser(data) {
 }
 
 function signupUser(data) {
+	console.log(data);
 	return auth.post('signup', data);
 }
 

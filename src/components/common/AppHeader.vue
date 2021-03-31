@@ -8,8 +8,8 @@
 		</div>
 		<div class="navigations">
 			<template v-if="!isLoggedIn">
-				<router-link to="/login">Login</router-link>
-				<router-link to="/signup">Sign Up</router-link>
+				<router-link to="/login">로그인</router-link>
+				<router-link to="/signup">회원가입</router-link>
 			</template>
 			<template v-else>
 				<a href="javascript:;" @click="logout" class="logout-button">Logout</a>
