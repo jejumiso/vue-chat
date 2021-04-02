@@ -73,7 +73,16 @@ export default {
 					console.log('LoginFrom - response : ' + response);
 					bus.$emit('show:toast', response.data.nickname + ' 로그인 되었습니다.');
 					//채팅 데이터에 등록
-
+					this.$firebase
+						.database()
+						.ref()
+						.child('users')
+						.child(this.nickname)
+						.set({
+							state: '로그인',
+							onclall: true,
+							alram: true,
+						});
 					this.$router.push('/main2');
 					this.initForm();
 				} else {

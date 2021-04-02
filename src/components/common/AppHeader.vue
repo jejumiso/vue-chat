@@ -3,7 +3,7 @@
 		<div>
 			<router-link to="/" class="logo">
 				TIL
-				<span v-if="isLoggedIn">by {{ this.$store.state.user.nickname }}</span>
+				<span v-if="isLoggedIn">by {{ this.$store.state.nickname }}</span>
 			</router-link>
 		</div>
 		<div class="navigations">
@@ -37,6 +37,19 @@ export default {
 	},
 	methods: {
 		logout() {
+			console.log('로그아웃 :::??? ' + this.$store.state.nickname);
+			console.log('로그아웃 ::: ' + this.$store.state.nickname);
+
+			this.$firebase
+				.database()
+				.ref()
+				.child('users')
+				.child(this.$store.state.nickname)
+				.set({
+					state: '로그아웃',
+					onclall: false,
+				});
+
 			bus.$emit('show:toast', '로그아웃.');
 			this.$store.commit('LOGOUT');
 			// this.$router.push('/');

@@ -5,22 +5,24 @@
 			<div v-for="(item, index) in BjRakingList" :key="item.memberId" v-bind:style="{ height: bj_height + 'px' }">
 				<!-- {{ item.photo_title }} -->
 				<div style="height:100%;padding:0 5px;position: relative;" @click="ModalPopup(item.nickname)">
-					<span style="position: absolute;bottom:5%;left:8%;font-weight:bold;color:white;font-size:1em;background-color: rgba( 5, 11, 11, 0.05 );"
-						>{{ index + 1 }}위<br />{{ item.nickname }}</span
-					>
+					<span style="position: absolute;bottom:5%;left:8%;font-weight:bold;color:white;font-size:1em;background-color: rgba( 5, 11, 11, 0.05 );">{{ index + 1 }}위<br />{{ item.nickname }}</span>
 					<img :src="item.photo_title" style="width:100%;height:100%;object-fit:cover;border-radius: 5%;" />
 				</div>
 			</div>
 		</VueTinySlider>
 		<ModalView v-if="isModalViewed" @close-modal="isModalViewed = false">
 			{{ this.$store.toId }}
+			<button @click="call($store.toId)" :disabled="willcall">연결하기</button>
+			<div v-if="willcall">
+				연결대기중입니다.
+			</div>
 		</ModalView>
 	</div>
 </template>
 
 <script>
 import { fetchBjRakingForMain } from '@/api/get.js';
-
+import bus from '@/utils/bus.js';
 import ModalView from '@/components/common/Modal';
 
 import VueTinySlider from 'vue-tiny-slider';
@@ -47,6 +49,7 @@ export default {
 			BjRakingList: null,
 			bj_height: 0,
 			isModalViewed: false,
+			willcall: false,
 		};
 	},
 	methods: {
@@ -73,18 +76,54 @@ export default {
 				console.log(error);
 			}
 		},
+		call(nickname) {
+			console.log('call : ' + nickname);
+			this.$firebase
+				.database()
+				.ref()
+				.child('users')
+				.child(nickname)
+				.child('calllist/' + this.$store.state.user.nickname)
+				.set({
+					roomid: '',
+				});
+			this.willcall = true;
+		},
 		ModalPopup(nickname) {
+			//초기화
+			this.willcall = false;
+
 			//[1] 상대방이 통화중이거나 부재중인지 확인.
 			//[1-1] 채팅 리스트에 없으면 offline
 			//[1-1] 채팅 리스트에 있으면 online  통화중인지..수신거부중인지 등 확이
-			var toIs = true; //통화가능여부
-			if (toIs) {
-				console.log(nickname + ' 팝업창 뛰우기');
-				this.isModalViewed = true;
-				this.$store.toId = nickname;
-				this.$store.toId = nickname;
-				this.$store.toId = nickname;
-			}
+			var datadata = null;
+			console.log('starCountRef nickname : ' + nickname);
+			var toIs = false;
+			var starCountRef = this.$firebase
+				.database()
+				.ref()
+				.child('users')
+				.child(nickname);
+			starCountRef.on('value', snapshot => {
+				const data = snapshot.val();
+				console.log('starCountRef : ' + data);
+				datadata = data;
+				if (!data) {
+					bus.$emit('show:toast', nickname + '님은 offline입니다.');
+					starCountRef.off();
+				} else {
+					toIs = data.onclall;
+					if (toIs) {
+						console.log(nickname + ' 팝업창 뛰우기');
+						this.isModalViewed = true;
+						this.$store.toId = nickname;
+					} else {
+						this.isModalViewed = false;
+						bus.$emit('show:toast', nickname + '님은' + datadata.state);
+						starCountRef.off();
+					}
+				}
+			});
 		},
 	},
 	created() {

@@ -26,10 +26,10 @@ export default {
 			this.message = message;
 			this.open = true;
 			clearTimeout(toastTimer);
-			toastTimer = setTimeout(this.hideToast, 2000);
+			toastTimer = setTimeout(this.hideToast, 20000);
 		},
 		hideToast() {
-			this.open = false;
+			this.open = true;
 		},
 	},
 	created() {
