@@ -21,10 +21,4 @@ function deletePostById(id) {
 	return posts.delete(id);
 }
 
-export {
-	createNewPost,
-	fetchPosts,
-	fetchPostById,
-	editPostById,
-	deletePostById,
-};
+export { createNewPost, fetchPosts, fetchPostById, editPostById, deletePostById };

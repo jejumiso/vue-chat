@@ -9,20 +9,9 @@
 				</div>
 				<div>
 					<label for="contents">Contents</label>
-					<textarea
-						name="contents"
-						id="contents"
-						cols="30"
-						rows="5"
-						v-model="contents"
-					></textarea>
+					<textarea name="contents" id="contents" cols="30" rows="5" v-model="contents"></textarea>
 				</div>
-				<button
-					type="submit"
-					class="btn"
-					:class="isButtonDisabled"
-					:disabled="isButtonDisabled"
-				>
+				<button type="submit" class="btn" :class="isButtonDisabled" :disabled="isButtonDisabled">
 					Edit
 				</button>
 			</form>
