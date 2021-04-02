@@ -9,26 +9,13 @@
 				</div>
 				<div>
 					<label for="contents">Contents</label>
-					<textarea
-						name="contents"
-						id="contents"
-						cols="30"
-						rows="5"
-						v-model="contents"
-					></textarea>
+					<textarea name="contents" id="contents" cols="30" rows="5" v-model="contents"></textarea>
 					<p class="validation-text" :class="{ reverse: isContentTooLong }">
-						<span v-if="isContentTooLong" class="warning"
-							>Maximum Length is 50</span
-						>
+						<span v-if="isContentTooLong" class="warning">Maximum Length is 50</span>
 						<span>{{ contentsLength }} / 250</span>
 					</p>
 				</div>
-				<button
-					type="submit"
-					class="btn"
-					:class="isButtonDisabled"
-					:disabled="isButtonDisabled"
-				>
+				<button type="submit" class="btn" :class="isButtonDisabled" :disabled="isButtonDisabled">
 					Create
 				</button>
 			</form>
@@ -63,9 +50,7 @@ export default {
 			return this.contents.length > 250;
 		},
 		isButtonDisabled() {
-			return !this.title || !this.contents || this.contents.length > 50
-				? 'disabled'
-				: null;
+			return !this.title || !this.contents || this.contents.length > 50 ? 'disabled' : null;
 		},
 	},
 	methods: {

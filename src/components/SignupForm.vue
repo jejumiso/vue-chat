@@ -1,7 +1,7 @@
 <template>
 	<div class="contents">
 		<div class="form-wrapper form-wrapper-sm">
-			<PageHeader>Sign Up</PageHeader>
+			<PageHeader>회원가입</PageHeader>
 			<form @submit.prevent="registerUser" class="form">
 				<div>
 					<label for="username">ID</label>
@@ -26,12 +26,34 @@
 					<input type="text" id="nickname" v-model="nickname" :class="nicknameValidClass" />
 				</div>
 				<button type="submit" class="btn" :class="isButtonDisabled" :disabled="isButtonDisabled">
-					Create
+					가입
 				</button>
 			</form>
 			<p class="log">
 				{{ logMessage }}
 			</p>
+		</div>
+		<div>
+			<button
+				class="btn"
+				@click="
+					username = 'a@a.com';
+					password = '12345678';
+					nickname = 'bj_12341234';
+				"
+			>
+				bj
+			</button>
+			<button
+				class="btn"
+				@click="
+					username = 'member@a.com';
+					password = '12345678';
+					nickname = 'member_12341234';
+				"
+			>
+				mem
+			</button>
 		</div>
 	</div>
 </template>
@@ -91,11 +113,11 @@ export default {
 		async registerUser() {
 			try {
 				await signupUser({
-					username: this.username,
+					teamid: 55,
 					password: this.password,
 					nickname: this.nickname,
 				});
-				this.logMessage = 'User is created';
+				this.logMessage = '가입이 완료 되었습니다.';
 				this.initForm();
 			} catch (error) {
 				console.log(error.response);
