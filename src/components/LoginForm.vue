@@ -72,6 +72,8 @@ export default {
 					console.log(response);
 					console.log('LoginFrom - response : ' + response);
 					bus.$emit('show:toast', response.data.nickname + ' 로그인 되었습니다.');
+					//채팅 데이터에 등록
+
 					this.$router.push('/main2');
 					this.initForm();
 				} else {

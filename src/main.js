@@ -3,6 +3,7 @@ import App from './App.vue';
 import router from './routes';
 import store from './store';
 import * as filters from './utils/filters.js';
+import './plugins/firebase';
 
 Vue.config.productionTip = false;
 

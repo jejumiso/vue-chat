@@ -12,7 +12,9 @@
 				</div>
 			</div>
 		</VueTinySlider>
-		<ModalView v-if="isModalViewed" @close-modal="isModalViewed = false"> <Content /> </ModalView>
+		<ModalView v-if="isModalViewed" @close-modal="isModalViewed = false">
+			{{ this.$store.toId }}
+		</ModalView>
 	</div>
 </template>
 
@@ -58,7 +60,6 @@ export default {
 			}
 		},
 		async fetchBjRakingForMain() {
-			console.log('d');
 			try {
 				const {
 					data: { content: BjRaking },
@@ -74,10 +75,15 @@ export default {
 		},
 		ModalPopup(nickname) {
 			//[1] 상대방이 통화중이거나 부재중인지 확인.
-			var isstate = false;
-			if (!isstate) {
+			//[1-1] 채팅 리스트에 없으면 offline
+			//[1-1] 채팅 리스트에 있으면 online  통화중인지..수신거부중인지 등 확이
+			var toIs = true; //통화가능여부
+			if (toIs) {
 				console.log(nickname + ' 팝업창 뛰우기');
 				this.isModalViewed = true;
+				this.$store.toId = nickname;
+				this.$store.toId = nickname;
+				this.$store.toId = nickname;
 			}
 		},
 	},

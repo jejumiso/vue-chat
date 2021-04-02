@@ -9,6 +9,10 @@ export default new Vuex.Store({
 	state: {
 		user: {},
 		token: '',
+		toID: '',
+		toState: '', //부재중/통화가능/통화중/OFF/통화일시정지중
+		toIs: '', // ture,false : 통화가능 여부
+		fromID: '',
 	},
 	getters: {
 		isLoggedIn(state) {
