@@ -4,7 +4,7 @@
 			<div style="width:5px;padding:0;margin:0"></div>
 			<div v-for="(item, index) in BjRakingList" :key="item.memberId" v-bind:style="{ height: bj_height + 'px' }">
 				<!-- {{ item.photo_title }} -->
-				<div style="height:100%;padding:0 5px;position: relative;">
+				<div style="height:100%;padding:0 5px;position: relative;" @click="ModalPopup(item.nickname)">
 					<span style="position: absolute;bottom:5%;left:8%;font-weight:bold;color:white;font-size:1em;background-color: rgba( 5, 11, 11, 0.05 );"
 						>{{ index + 1 }}위<br />{{ item.nickname }}</span
 					>
@@ -12,11 +12,14 @@
 				</div>
 			</div>
 		</VueTinySlider>
+		<ModalView v-if="isModalViewed" @close-modal="isModalViewed = false"> <Content /> </ModalView>
 	</div>
 </template>
 
 <script>
 import { fetchBjRakingForMain } from '@/api/get.js';
+
+import ModalView from '@/components/common/Modal';
 
 import VueTinySlider from 'vue-tiny-slider';
 import VueHead from 'vue-head';
@@ -27,7 +30,7 @@ export default {
 		//https://negabaro.github.io/archive/how-to-set-head-in-vue-spa
 		return { link: [{ rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.1/tiny-slider.css' }] };
 	},
-	components: { VueTinySlider },
+	components: { VueTinySlider, ModalView },
 	data() {
 		return {
 			tinySliderOptions: {
@@ -41,6 +44,7 @@ export default {
 			},
 			BjRakingList: null,
 			bj_height: 0,
+			isModalViewed: false,
 		};
 	},
 	methods: {
@@ -66,6 +70,14 @@ export default {
 				return;
 			} catch (error) {
 				console.log(error);
+			}
+		},
+		ModalPopup(nickname) {
+			//[1] 상대방이 통화중이거나 부재중인지 확인.
+			var isstate = false;
+			if (!isstate) {
+				console.log(nickname + ' 팝업창 뛰우기');
+				this.isModalViewed = true;
 			}
 		},
 	},
