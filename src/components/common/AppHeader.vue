@@ -37,18 +37,25 @@ export default {
 	},
 	methods: {
 		logout() {
-			console.log('로그아웃 :::??? ' + this.$store.state.nickname);
-			console.log('로그아웃 ::: ' + this.$store.state.nickname);
-
+			// this.$firebase
+			// 	.database()
+			// 	.ref()
+			// 	.child('users')
+			// 	.child(this.$store.state.nickname)
+			// 	.set({
+			// 		state: '로그아웃',
+			// 		onclall: false,
+			// 	});
 			this.$firebase
 				.database()
 				.ref()
 				.child('users')
 				.child(this.$store.state.nickname)
-				.set({
-					state: '로그아웃',
-					onclall: false,
+				.update({
+					onlineState: false,
+					status: 'logout',
 				});
+			//starCountRef.off();
 
 			bus.$emit('show:toast', '로그아웃.');
 			this.$store.commit('LOGOUT');

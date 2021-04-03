@@ -14,6 +14,7 @@ export default new Vuex.Store({
 		toState: '', //부재중/통화가능/통화중/OFF/통화일시정지중
 		toIs: '', // ture,false : 통화가능 여부
 		fromID: '',
+		refresh: false,
 	},
 	getters: {
 		isLoggedIn(state) {
@@ -26,7 +27,8 @@ export default new Vuex.Store({
 	mutations: {
 		SET_USER(state, user) {
 			state.user = user;
-			console.log('state.user : ');
+			state.nickname = user.nickname;
+			console.log('state.SET_USER : ');
 		},
 		SET_TOKEN(state, token) {
 			state.token = token;
@@ -43,10 +45,7 @@ export default new Vuex.Store({
 		async LOGIN({ commit }, data) {
 			const response = await loginUser(data);
 			if (response.data != '') {
-				console.log(response.data.nickname);
-				console.log('end');
-				// commit('SET_USER', response.data.user);
-				//commit('SET_TOKEN', response.data.token);
+				console.log('store.LOGIN : ' + response.data.nickname);
 				commit('SET_USER', response.data);
 				commit('SET_TOKEN', response.data.nickname);
 				saveUserToCookie(response.data.nickname);

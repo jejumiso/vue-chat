@@ -78,11 +78,12 @@ export default {
 						.ref()
 						.child('users')
 						.child(this.nickname)
-						.set({
-							state: '로그인',
-							onclall: true,
+						.update({
 							alram: true,
+							onlineState: true,
+							status: 'online',
 						});
+
 					this.$router.push('/main2');
 					this.initForm();
 				} else {

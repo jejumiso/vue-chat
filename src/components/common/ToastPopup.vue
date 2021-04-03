@@ -4,9 +4,9 @@
 			{{ message }}
 		</div>
 		<div class="toast_oncall" :class="toastAnimationClass_Oncall">
-			<div>{{ message }}<button>수락</button></div>
-			<br />
-			<div>전화요청리스트 보기</div>
+			<div v-if="iscall">{{ message }}<button>수락</button></div>
+			<div v-else>{{ message }}</div>
+			<div style="margin:20px 0 0 0 ">전화요청리스트 보기</div>
 		</div>
 	</div>
 </template>
@@ -21,6 +21,7 @@ export default {
 		return {
 			open: false,
 			open_oncall: false,
+			iscall: false,
 			message: '',
 		};
 	},
@@ -39,11 +40,11 @@ export default {
 			clearTimeout(toastTimer);
 			toastTimer = setTimeout(this.hideToast, 2000);
 		},
-		toast_oncall(from_nickname, message) {
+		toast_oncall(from_nickname, message, clearTimeout, iscall) {
 			this.message = message;
+			this.iscall = iscall;
 			this.open_oncall = true;
-			clearTimeout(toastTimer);
-			toastTimer = setTimeout(this.hideToast_oncall, 20000);
+			toastTimer = setTimeout(this.hideToast_oncall, clearTimeout);
 		},
 		hideToast() {
 			this.open = false;
@@ -85,23 +86,25 @@ export default {
 	transition: transform 500ms ease-in-out;
 }
 .toast_oncall {
+	padding: 20px;
 	position: fixed;
 	width: 400px;
 	height: 256px;
 	background-color: #22252e;
-	border-radius: 2px;
+	border-radius: 5%;
 	box-shadow: 0 8px 20px 0 rgba(0, 0, 0, 0.2);
 	color: white;
-	bottom: -120px;
+	bottom: -300px;
+	/* -120px; */
 	margin-left: -200px;
 	left: 50%;
-	display: flex;
+	display: block;
 	justify-content: center;
 	align-items: center;
 	transition: transform 750ms ease-out;
 }
 .toast_oncall.show {
-	transform: translateY(-150px);
+	transform: translateY(-300px);
 	transition: transform 500ms ease-in-out;
 }
 </style>

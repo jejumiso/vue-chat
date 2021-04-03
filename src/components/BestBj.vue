@@ -6,11 +6,11 @@
 				<!-- {{ item.photo_title }} -->
 				<div style="height:100%;padding:0 5px;position: relative;" @click="ModalPopup(item.nickname)">
 					<span style="position: absolute;bottom:5%;left:8%;font-weight:bold;color:white;font-size:1em;background-color: rgba( 5, 11, 11, 0.05 );">{{ index + 1 }}위<br />{{ item.nickname }}</span>
-					<img :src="item.photo_title" style="width:100%;height:100%;object-fit:cover;border-radius: 5%;" />
+					<img :src="item.photo_title" style="width:100%;height:100%;object-fit:cover;border-radius: 8%;" />
 				</div>
 			</div>
 		</VueTinySlider>
-		<ModalView v-if="isModalViewed" @close-modal="isModalViewed = false">
+		<ModalView v-if="isModalViewed" @close-modal="closemodel">
 			{{ this.$store.toId }}
 			<button @click="call($store.toId)" :disabled="willcall">연결하기</button>
 			<div v-if="willcall">
@@ -55,6 +55,11 @@ export default {
 		};
 	},
 	methods: {
+		closemodel() {
+			console.log('$store.toId');
+			this.cancel_call(this.$store.toId);
+			this.isModalViewed = false;
+		},
 		calwidth() {
 			var element = document.getElementById('content');
 			var w = element.clientWidth;
@@ -85,7 +90,7 @@ export default {
 				.ref()
 				.child('users')
 				.child(nickname)
-				.child('calllist')
+				.child('rooms')
 				.push().key;
 
 			this.$firebase
@@ -93,13 +98,47 @@ export default {
 				.ref()
 				.child('users')
 				.child(nickname)
-				.child('calllist')
+				.child('rooms')
 				.child(_key)
 				.set({
-					nickname: this.$store.state.nickname,
+					to: nickname,
+					from: this.$store.state.nickname,
 					roomid: '',
+					disabled: false,
 					state: '요청이들어왔습니다.',
 				});
+			// this.$firebase
+			// 	.database()
+			// 	.ref()
+			// 	.child('users')
+			// 	.child(nickname)
+			// 	.child('rooms')
+			// 	.child(_key)
+			// 	.OnDisconnect()
+			// 	.remove();
+			this.$firebase
+				.database()
+				.ref()
+				.child('users')
+				.child(this.$store.state.nickname)
+				.child('rooms')
+				.child(_key)
+				.set({
+					to: nickname,
+					from: this.$store.state.nickname,
+					disabled: false,
+					roomid: '',
+					state: '요청이하였습니다.',
+				});
+			// this.$firebase
+			// 	.database()
+			// 	.ref()
+			// 	.child('users')
+			// 	.child(this.$store.state.nickname)
+			// 	.child('rooms')
+			// 	.child(_key)
+			// 	.OnDisconnect()
+			// 	.remove();
 
 			console.log('생선된 키값 3: ' + _key);
 			this.keyvalue = _key;
@@ -111,11 +150,18 @@ export default {
 				.ref()
 				.child('users')
 				.child(nickname)
-				.child('calllist/' + this.keyvalue)
+				.child('rooms/' + this.keyvalue)
+				.remove();
+			this.$firebase
+				.database()
+				.ref()
+				.child('users')
+				.child(this.$store.state.nickname)
+				.child('rooms/' + this.keyvalue)
 				.remove();
 			this.willcall = false;
 		},
-		ModalPopup(nickname) {
+		async ModalPopup(nickname) {
 			//초기화
 			this.willcall = false;
 
@@ -123,34 +169,61 @@ export default {
 			//[1-1] 채팅 리스트에 없으면 offline
 			//[1-1] 채팅 리스트에 있으면 online  통화중인지..수신거부중인지 등 확이
 			console.log('starCountRef nickname : ' + nickname);
-			var toIs = false;
 			var starCountRef = this.$firebase
 				.database()
 				.ref()
 				.child('users')
 				.child(nickname);
 
-			//실시간이 아닌 한번 읽기로 바꿔야함...
-			starCountRef.on('value', snapshot => {
-				const data = snapshot.val();
-				console.log('starCountRef : ' + data);
-				if (!data) {
-					bus.$emit('show:toast', nickname + '님은 offline입니다.');
-					starCountRef.off();
-				} else {
-					toIs = data.onclall;
-					if (toIs) {
-						console.log(nickname + ' 팝업창 뛰우기');
-						this.isModalViewed = true;
-						this.$store.toId = nickname;
-						starCountRef.off();
+			var is = false;
+
+			await starCountRef
+				.get()
+				.then(function(snapshot) {
+					if (snapshot.exists()) {
+						const data = snapshot.val();
+
+						if (!data) {
+							bus.$emit('show:toast', nickname + '님은 offline입니다.');
+						} else {
+							if (data.onlineState) {
+								is = true;
+							} else {
+								is = false;
+								bus.$emit('show:toast', nickname + '님은' + data.status);
+							}
+						}
 					} else {
-						this.isModalViewed = false;
-						bus.$emit('show:toast', nickname + '님은' + data.state);
-						starCountRef.off();
+						console.log('No data available');
 					}
-				}
-			});
+				})
+				.catch(function(error) {
+					console.error('error             1234   :      ' + error);
+				});
+			this.isModalViewed = is;
+			console.log('this.isModalViewed = is ~~~~~~~~: ' + this.isModalViewed);
+			this.$store.toId = nickname;
+			// //실시간이 아닌 한번 읽기로 바꿔야함...
+			// starCountRef.on('value', snapshot => {
+			// 	const data = snapshot.val();
+			// 	console.log('starCountRef : ' + data);
+			// 	if (!data) {
+			// 		bus.$emit('show:toast', nickname + '님은 offline입니다.');
+			// 		starCountRef.off();
+			// 	} else {
+			// 		toIs = data.onclall;
+			// 		if (toIs) {
+			// 			console.log(nickname + ' 팝업창 뛰우기');
+			// 			this.isModalViewed = true;
+			// 			this.$store.toId = nickname;
+			// 			starCountRef.off();
+			// 		} else {
+			// 			this.isModalViewed = false;
+			// 			bus.$emit('show:toast', nickname + '님은' + data.state);
+			// 			starCountRef.off();
+			// 		}
+			// 	}
+			// });
 		},
 	},
 	created() {
