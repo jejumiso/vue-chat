@@ -52,42 +52,34 @@ export default {
 				.database()
 				.ref()
 				.child('users/' + my_nickname + '/rooms');
-			var int = 0;
 
 			starCountRef.on('value', snapshot => {
-				if (int === 0) {
-					int = 1;
-					console.log('value') + snapshot.key;
-				}
+				console.log('value') + snapshot.key;
 			});
 
 			starCountRef.on('child_added', data => {
-				console.log(data.val().from + '____this.$store.state.nickname_____' + this.$store.state.nickname);
+				console.log(data.val().disabled + '____this.$store.state.nickname_____' + this.$store.state.nickname);
 				if (data.val().from !== this.$store.state.nickname) {
-					if (int > 0) {
-						// console.log('child_added JSON.stringify : ' + JSON.stringify(data));
-						// console.log('child_added data.nickname : ' + data.val().nickname);
+					if (data.val().disabled === false) {
 						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 들어왔습니다.', 20000, true);
 					} else {
-						int = 1;
+						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 취소되었습니다.', 1000, false);
 					}
 				}
 			});
 			starCountRef.on('child_changed', data => {
 				if (data.val().from !== this.$store.state.nickname) {
-					console.log('child_changed') + data.key;
+					console.log('data.val().disabled' + data.val().disabled);
+					if (data.val().disabled === false) {
+						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 들어왔습니다.', 20000, true);
+					} else {
+						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 취소되었습니다.', 1000, false);
+					}
 				}
 			});
-
 			starCountRef.on('child_removed', data => {
 				if (data.val().from !== this.$store.state.nickname) {
-					if (int > 0) {
-						// console.log('child_added JSON.stringify : ' + JSON.stringify(data));
-						// console.log('child_added data.nickname : ' + data.val().nickname);
-						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 취소되었습니다.', 1000, false);
-					} else {
-						int = 1;
-					}
+					bus.$emit('show:toast_oncall', data.val().nickname, '요청이 취소되었습니다.', 1000, false);
 				}
 			});
 		},
