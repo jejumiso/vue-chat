@@ -83,30 +83,81 @@ export default {
 				console.log(error);
 			}
 		},
-		call(nickname) {
-			console.log('call : ' + nickname);
-			var _key = this.$firebase
+		call(to_nickname) {
+			//[1 - 1] users/rooms   roomKey
+			var roomid = this.$firebase
 				.database()
 				.ref()
 				.child('users')
-				.child(nickname)
+				.child(to_nickname)
 				.child('rooms')
 				.push().key;
-
+			//[2 - 1] chat_message    messageKey
+			var messageid = this.$firebase
+				.database()
+				.ref()
+				.child('chat_messages/' + roomid)
+				.push().key;
+			//[2 - 2] chat_message
+			var message_data = {
+				messageid: messageid,
+				messageUser: { nickname: to_nickname },
+				msgData: '날짜',
+				msgType: 'video_call',
+				readUserIds: '',
+			};
+			//[2 - 3] 메시지 data 입력
+			this.$firebase
+				.database()
+				.ref()
+				.child('chat_messages/' + roomid + '/' + messageid)
+				.set(message_data);
+			//[1 - 2] users/rooms
+			// this.$firebase
+			// 	.database()
+			// 	.ref()
+			// 	.child('chat_members/' + roomid)
+			// 	.child(this.$store.state.nickname)
+			// 	.set({});
+			var datas = {
+				to: to_nickname, //업성도 되나?
+				from: this.$store.state.nickname, //없어도 되나?
+				chatId: roomid,
+				creDate: '생성한날짜',
+				disabled: false,
+				lastMessage: '마지막메시지',
+				title: to_nickname + '으로 부터....',
+				totalUnreadCount: 0,
+			};
 			this.$firebase
 				.database()
 				.ref()
 				.child('users')
-				.child(nickname)
+				.child(to_nickname)
 				.child('rooms')
-				.child(_key)
-				.set({
-					to: nickname,
-					from: this.$store.state.nickname,
-					roomid: '',
-					disabled: false,
-					state: '요청이들어왔습니다.',
-				});
+				.child(roomid)
+				.set(datas);
+			this.$firebase
+				.database()
+				.ref()
+				.child('users')
+				.child(this.$store.state.nickname)
+				.child('rooms')
+				.child(roomid)
+				.set(datas);
+			//[2] chat_members
+			// this.$firebase
+			// 	.database()
+			// 	.ref()
+			// 	.child('chat_members/' + roomid)
+			// 	.child(to_nickname)
+			// 	.set({});
+			// this.$firebase
+			// 	.database()
+			// 	.ref()
+			// 	.child('chat_members/' + roomid)
+			// 	.child(this.$store.state.nickname)
+			// 	.set({});
 			// this.$firebase
 			// 	.database()
 			// 	.ref()
@@ -116,20 +167,7 @@ export default {
 			// 	.child(_key)
 			// 	.OnDisconnect()
 			// 	.remove();
-			this.$firebase
-				.database()
-				.ref()
-				.child('users')
-				.child(this.$store.state.nickname)
-				.child('rooms')
-				.child(_key)
-				.set({
-					to: nickname,
-					from: this.$store.state.nickname,
-					disabled: false,
-					roomid: '',
-					state: '요청이하였습니다.',
-				});
+
 			// this.$firebase
 			// 	.database()
 			// 	.ref()
@@ -140,26 +178,83 @@ export default {
 			// 	.OnDisconnect()
 			// 	.remove();
 
-			console.log('생선된 키값 3: ' + _key);
-			this.keyvalue = _key;
+			console.log('생선된 키값 3: ' + roomid);
+			this.keyvalue = roomid;
 			this.willcall = true;
 		},
-		cancel_call(nickname) {
-			this.$firebase
-				.database()
-				.ref()
-				.child('users')
-				.child(nickname)
-				.child('rooms/' + this.keyvalue)
-				.remove();
-			this.$firebase
+		async cancel_call(nickname) {
+			//[1] 요청자
+			var rooms = this.$firebase
 				.database()
 				.ref()
 				.child('users')
 				.child(this.$store.state.nickname)
-				.child('rooms/' + this.keyvalue)
-				.remove();
+				.child('rooms');
+			await rooms
+				.get()
+				.then(function(snapshot) {
+					if (snapshot.exists()) {
+						console.log(snapshot.val());
+						for (var room in snapshot.val()) {
+							if (room.nickname === nickname) {
+								room.disabled = true;
+							}
+						}
+					} else {
+						console.log('No data available');
+					}
+				})
+				.catch(function(error) {
+					console.error(error);
+				});
+			//[2] 요청받은자
+			var rooms2 = this.$firebase
+				.database()
+				.ref()
+				.child('users')
+				.child(nickname)
+				.child('rooms');
+			await rooms2
+				.get()
+				.then(function(snapshot) {
+					if (snapshot.exists()) {
+						console.log(snapshot.val());
+						for (var room in snapshot.val()) {
+							if (room.nickname === this.$store.state.nickname) {
+								room.disabled = true;
+							}
+						}
+					} else {
+						console.log('No data available');
+					}
+				})
+				.catch(function(error) {
+					console.error(error);
+				});
+
+			// this.$firebase
+			// 	.database()
+			// 	.ref()
+			// 	.child('users')
+			// 	.child(this.$store.state.nickname)
+			// 	.child('rooms/' + this.keyvalue)
+			// 	.remove();
 			this.willcall = false;
+			// this.$firebase
+			// 	.database()
+			// 	.ref()
+			// 	.child('users')
+			// 	.child(nickname)
+			// 	.child('rooms/' + this.keyvalue)
+			// 	.remove();
+			// this.$firebase
+			// 	.database()
+			// 	.ref()
+			// 	.child('users')
+			// 	.child(this.$store.state.nickname)
+			// 	.child('rooms/' + this.keyvalue)
+			// 	.remove();
+			// this.willcall = false;
 		},
 		async ModalPopup(nickname) {
 			//초기화
