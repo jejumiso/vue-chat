@@ -14,7 +14,8 @@
 			{{ this.$store.toId }}
 			<button @click="call($store.toId)" :disabled="willcall">연결하기</button>
 			<div v-if="willcall">
-				연결대기중입니다.
+				<div>연결대기중입니다.</div>
+				<button @click="cancel_call($store.toId)">취소</button>
 			</div>
 		</ModalView>
 	</div>
@@ -50,6 +51,7 @@ export default {
 			bj_height: 0,
 			isModalViewed: false,
 			willcall: false,
+			keyvalue: '',
 		};
 	},
 	methods: {
@@ -69,7 +71,7 @@ export default {
 				} = await fetchBjRakingForMain();
 
 				this.BjRakingList = BjRaking;
-				console.log(this.BjRakingList);
+				// console.log(this.BjRakingList);
 				this.calwidth();
 				return;
 			} catch (error) {
@@ -78,16 +80,40 @@ export default {
 		},
 		call(nickname) {
 			console.log('call : ' + nickname);
+			var _key = this.$firebase
+				.database()
+				.ref()
+				.child('users')
+				.child(nickname)
+				.child('calllist')
+				.push().key;
+
 			this.$firebase
 				.database()
 				.ref()
 				.child('users')
 				.child(nickname)
-				.child('calllist/' + this.$store.state.user.nickname)
+				.child('calllist')
+				.child(_key)
 				.set({
+					nickname: this.$store.state.nickname,
 					roomid: '',
+					state: '요청이들어왔습니다.',
 				});
+
+			console.log('생선된 키값 3: ' + _key);
+			this.keyvalue = _key;
 			this.willcall = true;
+		},
+		cancel_call(nickname) {
+			this.$firebase
+				.database()
+				.ref()
+				.child('users')
+				.child(nickname)
+				.child('calllist/' + this.keyvalue)
+				.remove();
+			this.willcall = false;
 		},
 		ModalPopup(nickname) {
 			//초기화
@@ -96,7 +122,6 @@ export default {
 			//[1] 상대방이 통화중이거나 부재중인지 확인.
 			//[1-1] 채팅 리스트에 없으면 offline
 			//[1-1] 채팅 리스트에 있으면 online  통화중인지..수신거부중인지 등 확이
-			var datadata = null;
 			console.log('starCountRef nickname : ' + nickname);
 			var toIs = false;
 			var starCountRef = this.$firebase
@@ -104,10 +129,11 @@ export default {
 				.ref()
 				.child('users')
 				.child(nickname);
+
+			//실시간이 아닌 한번 읽기로 바꿔야함...
 			starCountRef.on('value', snapshot => {
 				const data = snapshot.val();
 				console.log('starCountRef : ' + data);
-				datadata = data;
 				if (!data) {
 					bus.$emit('show:toast', nickname + '님은 offline입니다.');
 					starCountRef.off();
@@ -117,9 +143,10 @@ export default {
 						console.log(nickname + ' 팝업창 뛰우기');
 						this.isModalViewed = true;
 						this.$store.toId = nickname;
+						starCountRef.off();
 					} else {
 						this.isModalViewed = false;
-						bus.$emit('show:toast', nickname + '님은' + datadata.state);
+						bus.$emit('show:toast', nickname + '님은' + data.state);
 						starCountRef.off();
 					}
 				}

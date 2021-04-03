@@ -15,8 +15,8 @@
 import AppHeader from './components/common/AppHeader.vue';
 import AppFooter from './components/common/AppFooter.vue';
 import ToastPopup from './components/common/ToastPopup.vue';
-
 import bus from '@/utils/bus.js';
+// import bus from '@/utils/bus.js';
 
 export default {
 	data() {
@@ -28,8 +28,7 @@ export default {
 		AppFooter,
 	},
 	methods: {
-		ModalPopup() {
-			bus.$emit('show:toast', '전화 요청이 있습니다.');
+		OnCall() {
 			var my_nickname = this.$store.state.nickname;
 			console.log('app.vue nickname : ' + my_nickname);
 			var starCountRef = this.$firebase
@@ -37,21 +36,34 @@ export default {
 				.ref()
 				.child('users/' + my_nickname + '/calllist');
 			var int = 0;
-			starCountRef.on('value', snapshot => {
-				const data = snapshot.val();
-				console.log('전화요청?? : ' + data);
 
-				if (int > 0 && data) {
-					bus.$emit('show:toast', '진짜 전화 요청이 있습니다.');
-				} else {
-					bus.$emit('show:toast', '없어용' + int);
+			starCountRef.on('value', snapshot => {
+				if (int === 0) {
+					int = 1;
+					console.log('value') + snapshot.key;
 				}
-				int = int + 1;
+			});
+
+			starCountRef.on('child_added', data => {
+				if (int > 0) {
+					// console.log('child_added JSON.stringify : ' + JSON.stringify(data));
+					// console.log('child_added data.nickname : ' + data.val().nickname);
+					bus.$emit('show:toast_oncall', data.val().nickname, '요청이 들어왔습니다.');
+				} else {
+					int = 1;
+				}
+			});
+			starCountRef.on('child_changed', data => {
+				console.log('child_changed') + data.key;
+			});
+
+			starCountRef.on('child_removed', data => {
+				console.log('child_changed') + data.key;
 			});
 		},
 	},
 	mounted() {
-		this.ModalPopup();
+		this.OnCall();
 	},
 };
 </script>
