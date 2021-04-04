@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import AppHeader from './components/common/AppHeader.vue';
 import AppFooter from './components/common/AppFooter.vue';
 import ToastPopup from './components/common/ToastPopup.vue';
@@ -19,6 +20,9 @@ import bus from '@/utils/bus.js';
 // import bus from '@/utils/bus.js';
 
 export default {
+	computed: {
+		...mapGetters(['isLoggedIn']),
+	},
 	data() {
 		return {};
 	},
@@ -85,8 +89,12 @@ export default {
 		},
 	},
 	mounted() {
-		this.OnCall();
-		this.OnandOff();
+		if (this.isLoggedIn) {
+			this.OnCall();
+			this.OnandOff();
+		} else {
+			console.log('로그아웃상태입니다.');
+		}
 	},
 };
 </script>

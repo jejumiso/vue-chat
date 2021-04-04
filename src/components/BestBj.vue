@@ -11,11 +11,11 @@
 			</div>
 		</VueTinySlider>
 		<ModalView v-if="isModalViewed" @close-modal="closemodel">
-			{{ this.$store.toId }}
-			<button @click="call($store.toId)" :disabled="willcall">연결하기</button>
+			{{ this.to_nickname }}
+			<button @click="call(to_nickname)" :disabled="willcall">연결하기</button>
 			<div v-if="willcall">
 				<div>연결대기중입니다.</div>
-				<button @click="cancel_call($store.toId)">취소</button>
+				<button @click="cancel_call(to_nickname)">취소</button>
 			</div>
 		</ModalView>
 	</div>
@@ -52,6 +52,7 @@ export default {
 			isModalViewed: false,
 			keyvalue: '',
 			willcall: false,
+			to_nickname: '',
 		};
 	},
 	methods: {
@@ -60,7 +61,7 @@ export default {
 		},
 		closemodel() {
 			console.log('$store.toId');
-			this.cancel_call(this.$store.toId);
+			this.cancel_call(this.to_nickname);
 			this.isModalViewed = false;
 		},
 		calwidth() {
@@ -253,6 +254,7 @@ export default {
 			this.willcall = false;
 		},
 		async ModalPopup(to_nickname) {
+			this.to_nickname = to_nickname;
 			//초기화
 			this.willcall = false;
 
