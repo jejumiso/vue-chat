@@ -64,7 +64,7 @@ export default {
 					bus.$emit('show:toast', `${response.data.title} was deleted`);
 				}
 			} catch (error) {
-				console.log(error);
+				// console.log(error);
 			}
 		},
 	},

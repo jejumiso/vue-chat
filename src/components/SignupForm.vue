@@ -104,16 +104,14 @@ export default {
 			return this.nickname ? 'valid' : null;
 		},
 		isButtonDisabled() {
-			return !this.username || !this.password || !this.nickname || !validateEmail(this.username) || !validatePassword(this.password)
-				? 'disabled'
-				: null;
+			return !this.username || !this.password || !this.nickname || !validateEmail(this.username) || !validatePassword(this.password) ? 'disabled' : null;
 		},
 	},
 	methods: {
 		async registerUser() {
 			try {
 				await signupUser({
-					teamid: 55,
+					teamName: this.$store.state.teamName,
 					password: this.password,
 					nickname: this.nickname,
 				});

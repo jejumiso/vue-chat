@@ -12,7 +12,7 @@
 		</VueTinySlider>
 		<ModalView v-if="isModalViewed" @close-modal="closemodel">
 			{{ this.to_nickname }}
-			<button @click="call(to_nickname)" :disabled="willcall">연결하기</button>
+			<button @click="video_call(to_nickname)" :disabled="willcall">연결하기</button>
 			<div v-if="willcall">
 				<div>연결대기중입니다.</div>
 				<button @click="cancel_call(to_nickname)">취소</button>
@@ -53,12 +53,10 @@ export default {
 			keyvalue: '',
 			willcall: false,
 			to_nickname: '',
+			roomid: '',
 		};
 	},
 	methods: {
-		async updateRoomDisabled(room, isDisabled) {
-			await room.update({ disabled: isDisabled });
-		},
 		closemodel() {
 			console.log('$store.toId');
 			this.cancel_call(this.to_nickname);
@@ -87,21 +85,21 @@ export default {
 				console.log(error);
 			}
 		},
-		async call(to_nickname) {
+		async video_call(to_nickname) {
 			var roomid = '';
 			var from_nickname = this.$store.state.nickname;
-			//생성된 방이 있는지 확인한다.
+			// [1] 생성된 방이 있는지 확인한다.
 			await this.$firebase
 				.database()
 				.ref()
 				.child('users')
-				.child(to_nickname)
+				.child(from_nickname)
 				.child('rooms')
 				.get()
 				.then(function(snapshot) {
 					if (snapshot.exists()) {
 						for (var room in snapshot.val()) {
-							if (snapshot.child(room).val().to === to_nickname) {
+							if (snapshot.child(room).val().chatMember === to_nickname) {
 								roomid = room;
 							}
 						}
@@ -114,7 +112,7 @@ export default {
 					console.error(error);
 				});
 
-			//[1 - 1] users/rooms   roomKey
+			//[2] 이미 생성된 방이 없으면 방 생성.
 			if (roomid === '') {
 				roomid = await this.$firebase
 					.database()
@@ -125,42 +123,30 @@ export default {
 					.push().key;
 				console.log('생성된 방 rooid    => ' + roomid);
 				console.log('생성된 방 rooid    => ' + roomid);
-			} else {
-				console.log('XX생성된 방 rooid    => ' + roomid);
 			}
-
-			//[2 - 1] chat_message    messageKey
+			this.roomid = roomid;
+			//[3 - 1] chat_message    messageKey
 			var messageid = await this.$firebase
 				.database()
 				.ref()
 				.child('chat_messages/' + roomid)
 				.push().key;
-			//[2 - 2] chat_message
+			//[3 - 2] chat_message
 			var message_data = {
 				messageid: messageid,
-				messageUser: { nickname: to_nickname },
+				messageUser: { nickname: from_nickname }, //메시지 보낸사람
 				msgData: '날짜',
 				msgType: 'video_call',
 				readUserIds: '',
 			};
-			//[2 - 3] 메시지 data 입력
+			//[3 - 3] 메시지 data 입력
 			await this.$firebase
 				.database()
 				.ref()
 				.child('chat_messages/' + roomid + '/' + messageid)
 				.set(message_data);
-			//[1 - 2]  room 생성
-			var datas = {
-				to: to_nickname, //업성도 되나?
-				from: from_nickname, //없어도 되나?
-				chatId: roomid,
-				creDate: '생성한날짜',
-				disabled: false,
-				lastMessage: '마지막메시지',
-				title: to_nickname + '으로 부터....',
-				totalUnreadCount: 0,
-			};
-			//[1 - 3]  요청 받는자에게
+			//[4 - 1]  room 정보  user에게 주입
+			//[4 - 2]  요청 받는자에게
 			await this.$firebase
 				.database()
 				.ref()
@@ -168,8 +154,17 @@ export default {
 				.child(from_nickname)
 				.child('rooms')
 				.child(roomid)
-				.update(datas);
-			//[1 - 3]  요청자에게...
+				.update({
+					chatId: roomid,
+					creDate: '생성한날짜',
+					disabled: false,
+					lastMessage: '마지막메시지',
+					title: to_nickname + '으로 부터....',
+					chatMember: to_nickname,
+					lastUpdateMember: from_nickname,
+					totalUnreadCount: 0,
+				});
+			//[4 - 4]  요청자에게...
 			await this.$firebase
 				.database()
 				.ref()
@@ -177,125 +172,107 @@ export default {
 				.child(to_nickname)
 				.child('rooms')
 				.child(roomid)
-				.update(datas);
+				.update({
+					chatId: roomid,
+					creDate: '생성한날짜',
+					disabled: false,
+					lastMessage: '마지막메시지',
+					title: to_nickname + '으로 부터....',
+					chatMember: from_nickname,
+					lastUpdateMember: from_nickname,
+					totalUnreadCount: 0,
+				});
+			//[5 - 1]  요청 받는자에게
+			await this.$firebase
+				.database()
+				.ref()
+				.child('chat_members')
+				.child(roomid)
+				.child(to_nickname)
+				.update({
+					nickname: to_nickname,
+				});
+			//[5 - 1]  요청자에게...
+			await this.$firebase
+				.database()
+				.ref()
+				.child('chat_members')
+				.child(roomid)
+				.child(from_nickname)
+				.update({
+					nickname: from_nickname,
+				});
 			this.willcall = true;
 		},
 		async cancel_call(to_nickname) {
 			var from_nickname = this.$store.state.nickname;
 
 			//[1] 요청자
-			var rooms = this.$firebase
+			await this.$firebase
 				.database()
 				.ref()
 				.child('users')
 				.child(from_nickname)
-				.child('rooms');
-			var d = await rooms
-				.get()
-				.then(function(snapshot) {
-					if (snapshot.exists()) {
-						// for (var room in snapshot.val()) {
-						// 	if (snapshot.child(room).val().to === to_nickname) {
-						// 		console.log('snapshot.child(room).val().to                                 ===> ' + snapshot.child(room).val().to);
-						// 		console.log('snapshot.child(room).val().disabled                                 ===> ' + snapshot.child(room).val().disabled);
-						// 	}
-						// }
-						return snapshot;
-					} else {
-						console.log('No data available');
-					}
-				})
-				.catch(function(error) {
-					console.error(error);
-				});
-			for (var room in d.val()) {
-				var to = d.child(room).val().to;
-				console.log('snapshot.child(room).val().to                                 ===> ' + to + to_nickname);
-				var rooms2 = this.$firebase
-					.database()
-					.ref()
-					.child('users')
-					.child(from_nickname)
-					.child('rooms/' + room);
-				this.updateRoomDisabled(rooms2, true);
-				var rooms3 = this.$firebase
-					.database()
-					.ref()
-					.child('users')
-					.child(to_nickname)
-					.child('rooms/' + room);
-				this.updateRoomDisabled(rooms3, true);
-			}
-			// //[2] 요청받은자
-			// var rooms2 = this.$firebase
-			// 	.database()
-			// 	.ref()
-			// 	.child('users')
-			// 	.child(to_nickname)
-			// 	.child('rooms');
-			// await rooms2
-			// 	.get()
-			// 	.then(function(snapshot) {
-			// 		if (snapshot.exists()) {
-			// 			for (var room in snapshot.val()) {
-			// 				console.log(snapshot.child(room).val().from);
-			// 				if (snapshot.child(room).val().from === from_nickname) {
-			// 					snapshot.child(room).val().disabled = true;
-			// 				}
-			// 			}
-			// 		} else {
-			// 			console.log('No data available');
-			// 		}
-			// 	})
-			// 	.catch(function(error) {
-			// 		console.error(error);
-			// 	});
+				.child('rooms/' + this.roomid)
+				.update({ disabled: true });
+			await this.$firebase
+				.database()
+				.ref()
+				.child('users')
+				.child(to_nickname)
+				.child('rooms/' + this.roomid)
+				.update({ disabled: true });
 
 			this.willcall = false;
 		},
 		async ModalPopup(to_nickname) {
-			this.to_nickname = to_nickname;
-			//초기화
-			this.willcall = false;
+			var from_nickname = this.$store.state.nickname;
+			if (from_nickname !== to_nickname) {
+				this.to_nickname = to_nickname;
+				//초기화
+				this.willcall = false;
 
-			//[1] 상대방이 통화중이거나 부재중인지 확인.
-			//[1-1] 채팅 리스트에 없으면 offline
-			//[1-1] 채팅 리스트에 있으면 online  통화중인지..수신거부중인지 등 확이
-			console.log('starCountRef nickname : ' + to_nickname);
-			var starCountRef = this.$firebase
-				.database()
-				.ref()
-				.child('users')
-				.child(to_nickname);
+				//[1] 상대방이 통화중이거나 부재중인지 확인.
+				//[1-1] 채팅 리스트에 없으면 offline
+				//[1-1] 채팅 리스트에 있으면 online  통화중인지..수신거부중인지 등 확이
+				console.log('starCountRef nickname : ' + to_nickname);
+				var starCountRef = this.$firebase
+					.database()
+					.ref()
+					.child('users')
+					.child(to_nickname);
 
-			var is = false;
+				var is = false;
 
-			await starCountRef
-				.get()
-				.then(function(snapshot) {
-					if (snapshot.exists()) {
-						const data = snapshot.val();
+				await starCountRef
+					.get()
+					.then(function(snapshot) {
+						if (snapshot.exists()) {
+							const data = snapshot.val();
 
-						if (!data) {
-							bus.$emit('show:toast', to_nickname + '님은 offline입니다.');
-						} else {
-							if (data.onlineState) {
-								is = true;
+							if (!data) {
+								bus.$emit('show:toast', to_nickname + '님은 offline입니다.');
 							} else {
-								is = false;
-								bus.$emit('show:toast', to_nickname + '님은' + data.status);
+								if (data.onlineState) {
+									is = true;
+								} else {
+									is = false;
+									bus.$emit('show:toast', to_nickname + '님은' + data.status);
+								}
 							}
+						} else {
+							console.log('No data available');
 						}
-					} else {
-						console.log('No data available');
-					}
-				})
-				.catch(function(error) {
-					console.error('error             1234   :      ' + error);
-				});
-			this.isModalViewed = is;
-			console.log('this.isModalViewed = is ~~~~~~~~: 모달 : ' + this.isModalViewed);
-			this.$store.toId = to_nickname;
+					})
+					.catch(function(error) {
+						console.error('error             1234   :      ' + error);
+					});
+				this.isModalViewed = is;
+				console.log('this.isModalViewed = is ~~~~~~~~: 모달 : ' + this.isModalViewed);
+				this.$store.toId = to_nickname;
+			} else {
+				bus.$emit('show:toast', '본인에게는 요청 할 수 없어요.');
+			}
 		},
 	},
 	created() {

@@ -63,7 +63,7 @@ export default {
 
 			starCountRef.on('child_added', data => {
 				console.log(data.val().disabled + '____this.$store.state.nickname_____' + this.$store.state.nickname);
-				if (data.val().from !== this.$store.state.nickname) {
+				if (data.val().lastUpdateMember !== this.$store.state.nickname) {
 					if (data.val().disabled === false) {
 						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 들어왔습니다.', 20000, true);
 					} else {
@@ -72,7 +72,7 @@ export default {
 				}
 			});
 			starCountRef.on('child_changed', data => {
-				if (data.val().from !== this.$store.state.nickname) {
+				if (data.val().lastUpdateMember !== this.$store.state.nickname) {
 					console.log('data.val().disabled' + data.val().disabled);
 					if (data.val().disabled === false) {
 						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 들어왔습니다.', 20000, true);
@@ -82,7 +82,7 @@ export default {
 				}
 			});
 			starCountRef.on('child_removed', data => {
-				if (data.val().from !== this.$store.state.nickname) {
+				if (data.val().lastUpdateMember !== this.$store.state.nickname) {
 					bus.$emit('show:toast_oncall', data.val().nickname, '요청이 취소되었습니다.', 1000, false);
 				}
 			});
