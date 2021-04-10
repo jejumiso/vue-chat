@@ -1,6 +1,8 @@
 <template>
 	<div class="app">
-		<div id="content" style="width:100%;max-width:1200px;min-width:600px;margin:0 auto">
+		<VideoChat_M v-if="this.$store.state.videoChat"></VideoChat_M>
+
+		<div id="content" v-else style="width:100%;max-width:1200px;margin:0 auto">
 			<AppHeader></AppHeader>
 			<div class="app-contents">
 				<router-view></router-view>
@@ -14,10 +16,13 @@
 <script>
 import { mapGetters } from 'vuex';
 import AppHeader from './components/common/AppHeader.vue';
+import VideoChat_M from './components/common/VideoChat_M.vue';
 import AppFooter from './components/common/AppFooter.vue';
 import ToastPopup from './components/common/ToastPopup.vue';
 import bus from '@/utils/bus.js';
 // import bus from '@/utils/bus.js';
+
+//this.$store.state.videoChat
 
 export default {
 	computed: {
@@ -27,6 +32,7 @@ export default {
 		return {};
 	},
 	components: {
+		VideoChat_M,
 		AppHeader,
 		ToastPopup,
 		AppFooter,
@@ -90,6 +96,7 @@ export default {
 	},
 	mounted() {
 		if (this.isLoggedIn) {
+			console.log('로그인되었네요..');
 			this.OnCall();
 			this.OnandOff();
 		} else {

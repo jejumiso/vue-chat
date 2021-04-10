@@ -16,6 +16,8 @@ export default new Vuex.Store({
 		toIs: '', // ture,false : 통화가능 여부
 		fromID: '',
 		refresh: false,
+		content_width: 0,
+		videoChat: false,
 	},
 	getters: {
 		isLoggedIn(state) {

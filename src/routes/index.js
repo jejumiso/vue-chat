@@ -8,6 +8,8 @@ import PostAddView from '../views/PostAddView';
 import PostDetailView from '../views/PostDetailView';
 import store from '../store';
 import { getUserFromCookie } from '../utils/cookies.js';
+import VideoChatView from '../views/VideoChatView';
+import VideoChatView_M from '../views/VideoChatView_M';
 
 Vue.use(Router);
 
@@ -25,6 +27,16 @@ export default new Router({
 			beforeEnter(to, from, next) {
 				store.getters['isLoggedIn'] ? next('/main') : next();
 			},
+		},
+		{
+			path: '/videochat',
+			name: 'videochat',
+			component: VideoChatView,
+		},
+		{
+			path: '/videochat_m',
+			name: 'videochat_m',
+			component: VideoChatView_M,
 		},
 		{
 			path: '/signup',

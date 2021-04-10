@@ -4,7 +4,7 @@
 			{{ message }}
 		</div>
 		<div class="toast_oncall" :class="toastAnimationClass_Oncall">
-			<div v-if="iscall">{{ message }}<button>수락</button></div>
+			<div v-if="iscall">{{ message }}<button @click="taketheCall">수락</button></div>
 			<div v-else>{{ message }}</div>
 			<div style="margin:20px 0 0 0 ">전화요청리스트 보기</div>
 		</div>
@@ -34,6 +34,10 @@ export default {
 		},
 	},
 	methods: {
+		taketheCall() {
+			console.log('this.$store.state.videoChat = true;');
+			this.$store.state.videoChat = true;
+		},
 		showToast(message) {
 			this.message = message;
 			this.open = true;

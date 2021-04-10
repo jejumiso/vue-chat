@@ -10,10 +10,10 @@
 				</div>
 			</div>
 		</VueTinySlider>
-		<ModalView v-if="isModalViewed" @close-modal="closemodel">
+		<ModalView v-if="isModalViewed" @close-modal="closemodal">
 			{{ this.to_nickname }}
-			<button @click="video_call(to_nickname)" :disabled="willcall">연결하기</button>
-			<div v-if="willcall">
+			<button @click="video_call(to_nickname)" :disabled="iscalltrying">연결하기</button>
+			<div v-if="iscalltrying">
 				<div>연결대기중입니다.</div>
 				<button @click="cancel_call(to_nickname)">취소</button>
 			</div>
@@ -51,24 +51,34 @@ export default {
 			bj_height: 0,
 			isModalViewed: false,
 			keyvalue: '',
-			willcall: false,
+			iscalltrying: false,
 			to_nickname: '',
 			roomid: '',
 		};
 	},
 	methods: {
-		closemodel() {
-			console.log('$store.toId');
+		closemodal() {
+			console.log('closemodel...');
 			this.cancel_call(this.to_nickname);
 			this.isModalViewed = false;
 		},
 		calwidth() {
 			var element = document.getElementById('content');
 			var w = element.clientWidth;
+			console.log(' w w w w w w w w w w w w w w : ' + w);
 			if (w === 1200) {
 				this.bj_height = 250;
 			} else {
-				this.bj_height = w / 6;
+				this.tinySliderOptions = {
+					mouseDrag: true,
+					loop: false,
+					items: 4,
+					swipeAngle: 45,
+					nav: false, //네비 없애기
+					controls: false, //컨트롤(앞으로,뒤로) 없애기
+					gutter: 25, //슬라이드 사이의 공간(px)
+				};
+				this.bj_height = w / 4;
 			}
 		},
 		async fetchBjRakingForMain() {
@@ -202,7 +212,7 @@ export default {
 				.update({
 					nickname: from_nickname,
 				});
-			this.willcall = true;
+			this.iscalltrying = true;
 		},
 		async cancel_call(to_nickname) {
 			var from_nickname = this.$store.state.nickname;
@@ -223,14 +233,14 @@ export default {
 				.child('rooms/' + this.roomid)
 				.update({ disabled: true });
 
-			this.willcall = false;
+			this.iscalltrying = false;
 		},
 		async ModalPopup(to_nickname) {
 			var from_nickname = this.$store.state.nickname;
 			if (from_nickname !== to_nickname) {
 				this.to_nickname = to_nickname;
 				//초기화
-				this.willcall = false;
+				this.iscalltrying = false;
 
 				//[1] 상대방이 통화중이거나 부재중인지 확인.
 				//[1-1] 채팅 리스트에 없으면 offline
