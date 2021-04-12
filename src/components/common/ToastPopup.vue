@@ -24,6 +24,55 @@ const config = {
 		local: '#localVideo',
 		remote: '#remoteVideo',
 	},
+	media: {
+		audio: true,
+		video: true,
+	},
+};
+const roomid = this.$store.state.roomid;
+const messageid = this.$store.state.messageid;
+// const roomid = 'this.$store.state.roomid;';
+// const messageid = 'this.$store.state.messageid;';
+const listener = {
+	// onInit(token) {
+	// 	// UI 처리등 remon이 초기화 되었을 때 처리하여야 할 작업
+	// 	console.log('1. remon onInit');
+	// },
+	async onConnect(channelId) {
+		// myChannelId = channelId;
+		console.log('2. remon onConnect');
+		console.log('2. remon onConnect' + channelId);
+
+		await this.$firebase
+			.database()
+			.ref()
+			.child('chat_messages/' + roomid + '/' + messageid)
+			.update({
+				isReceiver: true,
+				isCaller: false,
+				str_sdate: 'onConnect',
+				str_edate: 'onConnect',
+			});
+	},
+	onComplete() {
+		// Do something
+		console.log('3. remon onComplete');
+	},
+	async onClose() {
+		// Do something
+		console.log('4. remon onClose');
+
+		await this.$firebase
+			.database()
+			.ref()
+			.child('chat_messages/' + roomid + '/' + messageid)
+			.update({
+				isReceiver: true,
+				isCaller: false,
+				str_sdate: 'onClose',
+				str_edate: 'onClose',
+			});
+	},
 };
 
 export default {
@@ -49,12 +98,13 @@ export default {
 			this.remon_click();
 		},
 		async remon_click() {
-			var _remonCall = '';
-			if (_remonCall === '') {
-				_remonCall = new Remon({ config });
-			}
-			console.log('4. this._remonCall   : ' + this.$store.state.channel_id);
-			_remonCall.connectCall(this.$store.state.channel_id);
+			// listener.onConnect();
+			this.$store.state.remonCall = new Remon({ listener, config });
+
+			//caller.listener.onConnect(this.$store.state.channel_i);
+			this.$store.state.remonCall.connectCall(this.$store.state.channel_id);
+			console.log('9. this.$store.state.remonCall : ' + this.$store.state.remonCall);
+
 			const roomid = this.$store.state.roomid;
 			const messageid = this.$store.state.messageid;
 

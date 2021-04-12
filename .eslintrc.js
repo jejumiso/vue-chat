@@ -20,7 +20,7 @@ module.exports = {
 				arrowParens: 'avoid',
 			},
 			'globals', {
-				Remon : false
+				// Remon : false
 			}
 		],
 	},

@@ -64,8 +64,9 @@ export default {
 		// 	remonCall.connectCall('CHANNEL_ID');
 		// },
 		remon_unclick() {
-			console.log('레몬 종료 클릭 ');
-			// remonCall.close();
+			console.log('end~ . this.$store.state.remonCall : ' + this.$store.state.remonCall);
+
+			this.$store.state.remonCall.close();
 			this.$store.state.isModalViewChat = false;
 		},
 		remon() {

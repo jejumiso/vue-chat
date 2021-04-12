@@ -1,6 +1,7 @@
 <template>
 	<div class="app">
-		여기는 어차피 안보이는 공간임.{{ this.$store.state.videoChat }}
+		여기는 어차피 안보이는 공간임 안쓰는거임... 나중에 이거 지우자..
+		{{ this.$store.state.videoChat }}
 
 		VideoChat.vue
 	</div>
