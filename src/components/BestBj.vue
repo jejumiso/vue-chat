@@ -10,21 +10,21 @@
 				</div>
 			</div>
 		</VueTinySlider>
-		<ModalView v-if="isModalViewed" @close-modal="closemodal">
+		<!-- <ModalView v-if="isModalViewed" @close-modal="closemodal">
 			{{ this.to_nickname }}
 			<button @click="video_call(to_nickname)" :disabled="iscalltrying">연결하기</button>
 			<div v-if="iscalltrying">
 				<div>연결대기중입니다.</div>
 				<button @click="cancel_call(to_nickname)">취소</button>
 			</div>
-		</ModalView>
+		</ModalView> -->
 	</div>
 </template>
 
 <script>
 import { fetchBjRakingForMain } from '@/api/get.js';
 import bus from '@/utils/bus.js';
-import ModalView from '@/components/common/Modal';
+// import ModalView from '@/components/common/Modal';
 
 import VueTinySlider from 'vue-tiny-slider';
 import VueHead from 'vue-head';
@@ -35,7 +35,10 @@ export default {
 		//https://negabaro.github.io/archive/how-to-set-head-in-vue-spa
 		return { link: [{ rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.1/tiny-slider.css' }] };
 	},
-	components: { VueTinySlider, ModalView },
+	components: {
+		VueTinySlider,
+		//  ModalView
+	},
 	data() {
 		return {
 			tinySliderOptions: {
@@ -52,14 +55,16 @@ export default {
 			isModalViewed: false,
 			keyvalue: '',
 			iscalltrying: false,
-			to_nickname: '',
+			// to_nickname: '',
 			roomid: '',
 		};
 	},
 	methods: {
 		closemodal() {
 			console.log('closemodel...');
-			this.cancel_call(this.to_nickname);
+			if (this.$store.state.toNickname !== '') {
+				this.cancel_call();
+			}
 			this.isModalViewed = false;
 		},
 		calwidth() {
@@ -95,21 +100,21 @@ export default {
 				console.log(error);
 			}
 		},
-		async video_call(to_nickname) {
+		async video_call(_toNickname) {
 			var roomid = '';
-			var from_nickname = this.$store.state.nickname;
+			var _nickname = this.$store.state.nickname;
 			// [1] 생성된 방이 있는지 확인한다.
 			await this.$firebase
 				.database()
 				.ref()
 				.child('users')
-				.child(from_nickname)
+				.child(_nickname)
 				.child('rooms')
 				.get()
 				.then(function(snapshot) {
 					if (snapshot.exists()) {
 						for (var room in snapshot.val()) {
-							if (snapshot.child(room).val().chatMember === to_nickname) {
+							if (snapshot.child(room).val().chatMember === _toNickname) {
 								roomid = room;
 							}
 						}
@@ -128,7 +133,7 @@ export default {
 					.database()
 					.ref()
 					.child('users')
-					.child(to_nickname)
+					.child(_toNickname)
 					.child('rooms')
 					.push().key;
 				console.log('생성된 방 rooid    => ' + roomid);
@@ -144,7 +149,7 @@ export default {
 			//[3 - 2] chat_message
 			var message_data = {
 				messageid: messageid,
-				messageUser: { nickname: from_nickname }, //메시지 보낸사람
+				messageUser: { nickname: _nickname }, //메시지 보낸사람
 				msgData: '날짜',
 				msgType: 'video_call',
 				readUserIds: '',
@@ -161,7 +166,7 @@ export default {
 				.database()
 				.ref()
 				.child('users')
-				.child(from_nickname)
+				.child(_nickname)
 				.child('rooms')
 				.child(roomid)
 				.update({
@@ -169,9 +174,9 @@ export default {
 					creDate: '생성한날짜',
 					disabled: false,
 					lastMessage: '마지막메시지',
-					title: to_nickname + '으로 부터....',
-					chatMember: to_nickname,
-					lastUpdateMember: from_nickname,
+					title: _toNickname + '으로 부터....',
+					chatMember: _toNickname,
+					lastUpdateMember: _nickname,
 					totalUnreadCount: 0,
 				});
 			//[4 - 4]  요청자에게...
@@ -179,7 +184,7 @@ export default {
 				.database()
 				.ref()
 				.child('users')
-				.child(to_nickname)
+				.child(_toNickname)
 				.child('rooms')
 				.child(roomid)
 				.update({
@@ -187,9 +192,9 @@ export default {
 					creDate: '생성한날짜',
 					disabled: false,
 					lastMessage: '마지막메시지',
-					title: to_nickname + '으로 부터....',
-					chatMember: from_nickname,
-					lastUpdateMember: from_nickname,
+					title: _toNickname + '으로 부터....',
+					chatMember: _nickname,
+					lastUpdateMember: _nickname,
 					totalUnreadCount: 0,
 				});
 			//[5 - 1]  요청 받는자에게
@@ -198,9 +203,9 @@ export default {
 				.ref()
 				.child('chat_members')
 				.child(roomid)
-				.child(to_nickname)
+				.child(_toNickname)
 				.update({
-					nickname: to_nickname,
+					nickname: _toNickname,
 				});
 			//[5 - 1]  요청자에게...
 			await this.$firebase
@@ -208,49 +213,50 @@ export default {
 				.ref()
 				.child('chat_members')
 				.child(roomid)
-				.child(from_nickname)
+				.child(_nickname)
 				.update({
-					nickname: from_nickname,
+					nickname: _nickname,
 				});
 			this.iscalltrying = true;
 		},
-		async cancel_call(to_nickname) {
-			var from_nickname = this.$store.state.nickname;
+		// async cancel_call() {
+		// 	this.$store.state.toNickname = '';
+		// 	var _toNickname = this.$store.state.toNickname;
+		// 	var nickname = this.$store.state.nickname;
 
-			//[1] 요청자
-			await this.$firebase
-				.database()
-				.ref()
-				.child('users')
-				.child(from_nickname)
-				.child('rooms/' + this.roomid)
-				.update({ disabled: true });
-			await this.$firebase
-				.database()
-				.ref()
-				.child('users')
-				.child(to_nickname)
-				.child('rooms/' + this.roomid)
-				.update({ disabled: true });
+		// 	//[1] 요청자
+		// 	await this.$firebase
+		// 		.database()
+		// 		.ref()
+		// 		.child('users')
+		// 		.child(nickname)
+		// 		.child('rooms/' + this.roomid)
+		// 		.update({ disabled: true });
+		// 	await this.$firebase
+		// 		.database()
+		// 		.ref()
+		// 		.child('users')
+		// 		.child(_toNickname)
+		// 		.child('rooms/' + this.roomid)
+		// 		.update({ disabled: true });
 
-			this.iscalltrying = false;
-		},
-		async ModalPopup(to_nickname) {
-			var from_nickname = this.$store.state.nickname;
-			if (from_nickname !== to_nickname) {
-				this.to_nickname = to_nickname;
+		// 	this.iscalltrying = false;
+		// },
+		async ModalPopup(_toNickname) {
+			var _nickname = this.$store.state.nickname;
+			if (_nickname !== _toNickname) {
 				//초기화
 				this.iscalltrying = false;
 
 				//[1] 상대방이 통화중이거나 부재중인지 확인.
 				//[1-1] 채팅 리스트에 없으면 offline
 				//[1-1] 채팅 리스트에 있으면 online  통화중인지..수신거부중인지 등 확이
-				console.log('starCountRef nickname : ' + to_nickname);
+				console.log('starCountRef nickname : ' + _toNickname);
 				var starCountRef = this.$firebase
 					.database()
 					.ref()
 					.child('users')
-					.child(to_nickname);
+					.child(_toNickname);
 
 				var is = false;
 
@@ -261,13 +267,13 @@ export default {
 							const data = snapshot.val();
 
 							if (!data) {
-								bus.$emit('show:toast', to_nickname + '님은 offline입니다.');
+								bus.$emit('show:toast', _toNickname + '님은 offline입니다.');
 							} else {
 								if (data.onlineState) {
 									is = true;
 								} else {
 									is = false;
-									bus.$emit('show:toast', to_nickname + '님은' + data.status);
+									bus.$emit('show:toast', _toNickname + '님은' + data.status);
 								}
 							}
 						} else {
@@ -277,9 +283,9 @@ export default {
 					.catch(function(error) {
 						console.error('error             1234   :      ' + error);
 					});
-				this.isModalViewed = is;
+				this.$store.state.isModalViewed = is;
 				console.log('this.isModalViewed = is ~~~~~~~~: 모달 : ' + this.isModalViewed);
-				this.$store.toId = to_nickname;
+				this.$store.state.toNickname = _toNickname;
 			} else {
 				bus.$emit('show:toast', '본인에게는 요청 할 수 없어요.');
 			}
@@ -309,14 +315,9 @@ div.container {
 #tns1 > .tns-item {
 	padding: 0;
 }
-.tns-item {
-	/* font-size: 3rem;
-	font-family: Arial;
-	text-align: center; */
-	/* padding: 2em; */
-	/* background: #fafafb; */
+/* .tns-item {
+
 }
 .tns-item:nth-child(odd) {
-	/* background: #c8e1ff; */
-}
+} */
 </style>

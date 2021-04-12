@@ -66,6 +66,7 @@ export default {
 			this.remon_vue = false;
 
 			remonCall.connectCall('CHANNEL_ID');
+			remonCall.onClose({});
 		},
 		remon_unclick() {
 			this.remon_vue = true;

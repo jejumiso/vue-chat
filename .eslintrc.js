@@ -19,6 +19,9 @@ module.exports = {
 				bracketSpacing: true,
 				arrowParens: 'avoid',
 			},
+			'globals', {
+				Remon : false
+			}
 		],
 	},
 	parserOptions: {

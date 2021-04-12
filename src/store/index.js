@@ -7,17 +7,23 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
 	state: {
-		teamName: 'teamA',
+		teamName: 'teamA', //절대 변하지 않는값.
 		nickname: getUserFromCookie() || '',
-		user: {},
+		//user: {},
 		token: '',
-		toID: '',
-		toState: '', //부재중/통화가능/통화중/OFF/통화일시정지중
-		toIs: '', // ture,false : 통화가능 여부
-		fromID: '',
-		refresh: false,
-		content_width: 0,
-		videoChat: false,
+		toNickname: '',
+
+		// toState: '', //부재중/통화가능/통화중/OFF/통화일시정지중
+		// toIs: '', // ture,false : 통화가능 여부
+		// fromID: '',
+		// refresh: false,
+		// content_width: 0,
+		isModalViewChat: false,
+		isModalViewed: false,
+		channel_id: '',
+		roomid: '',
+		messageid: '',
+		remonCall: '',
 	},
 	getters: {
 		isLoggedIn(state) {
@@ -37,7 +43,8 @@ export default new Vuex.Store({
 			state.token = token;
 		},
 		LOGOUT(state) {
-			state.user = null;
+			// state.user = null;
+			state.nickname = '';
 			state.token = null;
 			deleteCookie('til_auth');
 			deleteCookie('til_user');

@@ -15,6 +15,16 @@
 import bus from '@/utils/bus.js';
 
 let toastTimer;
+const config = {
+	credential: {
+		serviceId: '08bf9373-ad2a-4a51-8475-f7274586fd09',
+		key: '72f46995bc1a38ced48772b85d5dd4e16929a9785db8f3656f6e083ca2a4ffae',
+	},
+	view: {
+		local: '#localVideo',
+		remote: '#remoteVideo',
+	},
+};
 
 export default {
 	data() {
@@ -35,8 +45,29 @@ export default {
 	},
 	methods: {
 		taketheCall() {
-			console.log('this.$store.state.videoChat = true;');
-			this.$store.state.videoChat = true;
+			this.$store.state.isModalViewChat = true;
+			this.remon_click();
+		},
+		async remon_click() {
+			var _remonCall = '';
+			if (_remonCall === '') {
+				_remonCall = new Remon({ config });
+			}
+			console.log('4. this._remonCall   : ' + this.$store.state.channel_id);
+			_remonCall.connectCall(this.$store.state.channel_id);
+			const roomid = this.$store.state.roomid;
+			const messageid = this.$store.state.messageid;
+
+			await this.$firebase
+				.database()
+				.ref()
+				.child('chat_messages/' + roomid + '/' + messageid)
+				.update({
+					isReceiver: true,
+					isCaller: false,
+					str_sdate: '',
+					str_edate: '',
+				});
 		},
 		showToast(message) {
 			this.message = message;

@@ -1,7 +1,6 @@
 <template>
 	<div class="app">
-		<VideoChat_M v-if="this.$store.state.videoChat"></VideoChat_M>
-
+		<VideoChat_M v-if="this.$store.state.isModalViewChat"></VideoChat_M>
 		<div id="content" v-else style="width:100%;max-width:1200px;margin:0 auto">
 			<AppHeader></AppHeader>
 			<div class="app-contents">
@@ -10,12 +9,14 @@
 			<AppFooter></AppFooter>
 			<ToastPopup></ToastPopup>
 		</div>
+		<ModalTrayChat></ModalTrayChat>
 	</div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import AppHeader from './components/common/AppHeader.vue';
+import ModalTrayChat from './components/common/ModalTrayChat.vue';
 import VideoChat_M from './components/common/VideoChat_M.vue';
 import AppFooter from './components/common/AppFooter.vue';
 import ToastPopup from './components/common/ToastPopup.vue';
@@ -33,6 +34,7 @@ export default {
 	},
 	components: {
 		VideoChat_M,
+		ModalTrayChat,
 		AppHeader,
 		ToastPopup,
 		AppFooter,
@@ -56,40 +58,54 @@ export default {
 		},
 		//전화요청이 들어 오는것에 대해서...
 		OnCall() {
-			var my_nickname = this.$store.state.nickname;
-			console.log('app.vue nickname : ' + my_nickname);
+			var _nickname = this.$store.state.nickname;
+			console.log('app.vue nickname : ' + _nickname);
 			var starCountRef = this.$firebase
 				.database()
 				.ref()
-				.child('users/' + my_nickname + '/rooms');
+				.child('users/' + _nickname + '/rooms');
 
-			starCountRef.on('value', snapshot => {
-				console.log('value') + snapshot.key;
-			});
+			// starCountRef.on('value', snapshot => {
+			// 	console.log('1. oncall value' + snapshot.key);
+			// });
 
 			starCountRef.on('child_added', data => {
-				console.log(data.val().disabled + '____this.$store.state.nickname_____' + this.$store.state.nickname);
+				console.log('2222. ' + this.$store.state.nickname);
 				if (data.val().lastUpdateMember !== this.$store.state.nickname) {
-					if (data.val().disabled === false) {
-						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 들어왔습니다.', 20000, true);
-					} else {
-						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 취소되었습니다.', 1000, false);
-					}
+					// if (data.val().disabled === false) {
+					// 	bus.$emit('show:toast_oncall', data.val().nickname, '요청이 들어왔습니다.', 20000, true);
+					// 	this.$store.state.roomid = data.val().roomid;
+					// 	this.$store.state.channel_id = data.val().lastChannel_id;
+					// 	// this.$store.state.messageid = data.val().channel_id;
+					// } else {
+					// 	bus.$emit('show:toast_oncall', data.val().nickname, '요청이 취소되었습니다.', 1000, false);
+					// 	this.$store.state.roomid = '';
+					// 	this.$store.state.channel_id = '';
+					// }
 				}
 			});
 			starCountRef.on('child_changed', data => {
 				if (data.val().lastUpdateMember !== this.$store.state.nickname) {
-					console.log('data.val().disabled' + data.val().disabled);
+					console.log('3333.  data.val().disabled' + data.val().disabled);
 					if (data.val().disabled === false) {
 						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 들어왔습니다.', 20000, true);
+						this.$store.state.roomid = data.val().roomid;
+						this.$store.state.channel_id = data.val().lastChannel_id;
+						this.$store.state.messageid = data.val().lastmessageid;
 					} else {
 						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 취소되었습니다.', 1000, false);
+						this.$store.state.roomid = '';
+						this.$store.state.channel_id = '';
+						this.$store.state.messageid = '';
 					}
 				}
 			});
 			starCountRef.on('child_removed', data => {
 				if (data.val().lastUpdateMember !== this.$store.state.nickname) {
 					bus.$emit('show:toast_oncall', data.val().nickname, '요청이 취소되었습니다.', 1000, false);
+					this.$store.state.roomid = '';
+					this.$store.state.channel_id = '';
+					this.$store.state.messageid = '';
 				}
 			});
 		},
