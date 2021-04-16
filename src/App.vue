@@ -42,19 +42,41 @@ export default {
 	methods: {
 		//로그아웃이나 창을 끌 경우 오프라인 처리..
 		OnandOff() {
-			var my_nickname = this.$store.state.nickname;
-			var starCountRef = this.$firebase
+			let my_nickname = this.$store.state.nickname;
+			let _firebase = this.$firebase;
+			this.$store.state.loginOnOffRef = _firebase
 				.database()
 				.ref()
 				.child('users/' + my_nickname);
-			starCountRef.update({
+			this.$store.state.loginOnOffRef.update({
 				onlineState: true,
 				status: 'online',
 			});
-			starCountRef.onDisconnect().update({
+
+			this.$store.state.loginOnOffRef.onDisconnect().update({
 				onlineState: false,
 				status: 'offline',
 			});
+
+			// var my_nickname = this.$store.state.nickname;
+			// var starCountRef = this.$firebase
+			// 	.database()
+			// 	.ref()
+			// 	.child('users/' + my_nickname);
+			// starCountRef.update({
+			// 	onlineState: true,
+			// 	status: 'online',
+			// });
+			// starCountRef.onDisconnect().update({
+			// 	onlineState: false,
+			// 	status: 'offline',
+			// });
+			// starCountRef.onDisconnect().set(false);
+			// starCountRef.onDisconnect().cancel();
+			// starCountRef.onDisconnect().update({
+			// 	onlineState: false,
+			// 	status: '2222',
+			// });
 		},
 		//전화요청이 들어 오는것에 대해서...
 		OnCall() {
@@ -90,6 +112,7 @@ export default {
 					if (data.val().disabled === false) {
 						bus.$emit('show:toast_oncall', data.val().nickname, '요청이 들어왔습니다.', 20000, true);
 						this.$store.state.roomid = data.val().roomid;
+						console.log('55555555555 this.$store.state.roomid   : ' + this.$store.state.roomid);
 						this.$store.state.channel_id = data.val().lastChannel_id;
 						this.$store.state.messageid = data.val().lastmessageid;
 					} else {

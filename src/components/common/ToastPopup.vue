@@ -15,65 +15,6 @@
 import bus from '@/utils/bus.js';
 
 let toastTimer;
-const config = {
-	credential: {
-		serviceId: '08bf9373-ad2a-4a51-8475-f7274586fd09',
-		key: '72f46995bc1a38ced48772b85d5dd4e16929a9785db8f3656f6e083ca2a4ffae',
-	},
-	view: {
-		local: '#localVideo',
-		remote: '#remoteVideo',
-	},
-	media: {
-		audio: true,
-		video: true,
-	},
-};
-const roomid = this.$store.state.roomid;
-const messageid = this.$store.state.messageid;
-// const roomid = 'this.$store.state.roomid;';
-// const messageid = 'this.$store.state.messageid;';
-const listener = {
-	// onInit(token) {
-	// 	// UI 처리등 remon이 초기화 되었을 때 처리하여야 할 작업
-	// 	console.log('1. remon onInit');
-	// },
-	async onConnect(channelId) {
-		// myChannelId = channelId;
-		console.log('2. remon onConnect');
-		console.log('2. remon onConnect' + channelId);
-
-		await this.$firebase
-			.database()
-			.ref()
-			.child('chat_messages/' + roomid + '/' + messageid)
-			.update({
-				isReceiver: true,
-				isCaller: false,
-				str_sdate: 'onConnect',
-				str_edate: 'onConnect',
-			});
-	},
-	onComplete() {
-		// Do something
-		console.log('3. remon onComplete');
-	},
-	async onClose() {
-		// Do something
-		console.log('4. remon onClose');
-
-		await this.$firebase
-			.database()
-			.ref()
-			.child('chat_messages/' + roomid + '/' + messageid)
-			.update({
-				isReceiver: true,
-				isCaller: false,
-				str_sdate: 'onClose',
-				str_edate: 'onClose',
-			});
-	},
-};
 
 export default {
 	data() {
@@ -97,17 +38,64 @@ export default {
 			this.$store.state.isModalViewChat = true;
 			this.remon_click();
 		},
-		async remon_click() {
-			// listener.onConnect();
+		remon_click() {
+			var _roomid = this.$store.state.roomid;
+			var _messageid = this.$store.state.messageid;
+			console.log('666666666. this.$firebase : ' + this.$firebase);
+			var _firebase = this.$firebase;
+			var messagei3d = _firebase
+				.database()
+				.ref()
+				.child('chat_messages/' + _roomid + '/' + _messageid);
+			const listener = {
+				async onConnect(channelId) {
+					// myChannelId = channelId;
+					console.log('2. remon onConnect');
+					console.log('2. remon onConnect' + channelId);
+					console.log('2. remon onConnect' + _roomid);
+					console.log('2. remon onConnect' + _messageid);
+					// this.remon_onConnect(_roomid, _messageid);
+
+					await messagei3d.update({
+						isReceiver: true,
+						isCaller: false,
+						str_sdate: 'onConnect',
+						str_edate: 'onConnect',
+					});
+
+					messagei3d.onDisconnect().update({
+						str_sdate: 'onDisconnect',
+						str_edate: 'onDisconnect',
+					});
+				},
+				onComplete() {
+					// Do something
+					console.log('3. remon onComplete');
+				},
+				async onClose() {
+					console.log('4. remon onClose');
+					await _firebase
+						.database()
+						.ref()
+						.child('chat_messages/' + _roomid + '/' + _messageid)
+						.update({
+							isReceiver: true,
+							isCaller: false,
+							str_sdate: 'onClose',
+							str_edate: 'onClose',
+						});
+				},
+			};
+			const config = this.$store.state.config;
+			// eslint-disable-next-line no-undef
 			this.$store.state.remonCall = new Remon({ listener, config });
 
 			//caller.listener.onConnect(this.$store.state.channel_i);
 			this.$store.state.remonCall.connectCall(this.$store.state.channel_id);
 			console.log('9. this.$store.state.remonCall : ' + this.$store.state.remonCall);
-
-			const roomid = this.$store.state.roomid;
-			const messageid = this.$store.state.messageid;
-
+		},
+		async remon_onConnect(roomid, messageid) {
+			console.log('77777777777. roomid, messageid : ' + roomid);
 			await this.$firebase
 				.database()
 				.ref()
@@ -115,8 +103,8 @@ export default {
 				.update({
 					isReceiver: true,
 					isCaller: false,
-					str_sdate: '',
-					str_edate: '',
+					str_sdate: 'onConnect',
+					str_edate: 'onConnect',
 				});
 		},
 		showToast(message) {

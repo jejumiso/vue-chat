@@ -1,7 +1,7 @@
 <template>
 	<header :class="{ fixed: isFixed }" ref="appHeader">
 		<div>
-			<router-link to="/" class="logo">
+			<router-link to="/main" class="logo">
 				TIL
 				<span v-if="isLoggedIn">by {{ this.$store.state.nickname }}</span>
 			</router-link>
@@ -37,15 +37,6 @@ export default {
 	},
 	methods: {
 		logout() {
-			// this.$firebase
-			// 	.database()
-			// 	.ref()
-			// 	.child('users')
-			// 	.child(this.$store.state.nickname)
-			// 	.set({
-			// 		state: '로그아웃',
-			// 		onclall: false,
-			// 	});
 			this.$firebase
 				.database()
 				.ref()
@@ -55,7 +46,8 @@ export default {
 					onlineState: false,
 					status: 'logout',
 				});
-			//starCountRef.off();
+			this.$store.state.loginOnOffRef.onDisconnect().cancel();
+			this.$store.state.loginOnOffRef = '';
 
 			bus.$emit('show:toast', '로그아웃.');
 			this.$store.commit('LOGOUT');

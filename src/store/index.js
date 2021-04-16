@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import { loginUser } from '@/api/auth';
 import { saveAuthToCookie, saveUserToCookie, getUserFromCookie, deleteCookie } from '@/utils/cookies.js';
-
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -21,9 +20,25 @@ export default new Vuex.Store({
 		isModalViewChat: false,
 		isModalViewed: false,
 		channel_id: '',
-		roomid: '',
+		roomid: 'roomid',
 		messageid: '',
 		remonCall: '',
+		config: {
+			credential: {
+				serviceId: '08bf9373-ad2a-4a51-8475-f7274586fd09',
+				key: '72f46995bc1a38ced48772b85d5dd4e16929a9785db8f3656f6e083ca2a4ffae',
+			},
+			view: {
+				local: '#localVideo',
+				remote: '#remoteVideo',
+			},
+			media: {
+				audio: true,
+				video: true,
+			},
+		},
+		listener: '',
+		loginOnOff: '',
 	},
 	getters: {
 		isLoggedIn(state) {
