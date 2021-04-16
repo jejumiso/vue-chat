@@ -1,5 +1,5 @@
 <template>
-	<ModalView v-if="$store.state.isModalViewed" @close-modal="closemodal">
+	<ModalView @close-modal="closemodal">
 		<button @click="video_call()" :disabled="iscalltrying">연결하기</button>
 		<div v-if="iscalltrying">
 			<div>연결대기중입니다.</div>
@@ -96,8 +96,8 @@ export default {
 					.child(_toNickname)
 					.child('rooms')
 					.push().key;
-				console.log('생성된 방 rooid    => ' + roomid);
-				console.log('생성된 방 rooid    => ' + roomid);
+				// console.log('생성된 방 rooid    => ' + roomid);
+				// console.log('생성된 방 rooid    => ' + roomid);
 			}
 			this.roomid = roomid;
 
@@ -113,16 +113,19 @@ export default {
 			var message_data = {
 				messageid: messageid,
 				messageUser: { nickname: _nickname }, //메시지 보낸사람
-				msgData: '날짜',
+				msgData: '보낸 날짜/시간',
 				msgType: 'video_call',
-				readUserIds: '',
+				// readUserIds: '', //? 머지?
 				channel_id: channel_id,
-				isReceiver: false,
-				isCaller: false,
-				str_sdate: '',
-				str_edate: '',
+				isReceiver: false, //요청 받는자 수락 여부
+				isCaller: false, // 요청 받는자  : 요청 받는자가 수락 한 이후 요청 받는자가 그것을 확인 후.....
+				str_sdate: '', //영상 채팅 시작 시간 : 둘다 접속 된 시간
+				str_edate: '', //영상 채팅 종료 시간 : 둘다 접속 된 이후 한면 이상이 종료 된 시간.
+				cancel: false, //영상 채팅 연결 이후 취소가 되면 true
+				total_sencond: 0, // 채팅 시간 : str_edate - str_sdate
+				cancelstr: '', //시간 경과, 요청 받는자의 수신 거부 , 요청자의 취소
 			};
-			console.log('1. roomidroomidroomidroomidroomidroomidroomidroomid   : ' + _nickname);
+			// console.log('1. roomidroomidroomidroomidroomidroomidroomidroomid   : ' + _nickname);
 			//[3 - 3] 메시지 data 입력
 			await this.$firebase
 				.database()
@@ -131,11 +134,7 @@ export default {
 				.set(message_data);
 			//[4 - 1]  room 정보  user에게 주입
 			//[4 - 2]  요청 받는자에게
-			console.log('2. roomidroomidroomidroomidroomidroomidroomidroomid   : ' + roomid);
 
-			console.log('3. roomidroomidroomidroomidroomidroomidroomidroomid   : ' + roomid);
-
-			console.log('4. roomidroomidroomidroomidroomidroomidroomidroomid   : ' + roomid);
 			await this.$firebase
 				.database()
 				.ref()
@@ -220,17 +219,23 @@ export default {
 				.child('chat_messages/' + roomid + '/' + messageid);
 
 			starCountRef.on('value', data => {
-				console.log('4.  bj가 통화 요청을 수락할까?' + data.val().isReceiver);
-				console.log(data);
-				console.log(data.val());
-				if (data.val().isReceiver === true) {
+				// console.log('4.  bj가 통화 요청을 수락할까?' + data.val().isReceiver);
+				// console.log(data);
+				// console.log(data.val());
+				if (data.val().isReceiver === true && data.val().str_edate === '') {
 					console.log('6.  bj가 통화 요청을 수락하였습니다.');
 					this.$store.state.isModalViewed = false;
-					var _remonCall = new Remon({ config });
-					_remonCall.connectCall(channel_id);
+					// eslint-disable-next-line no-undef
+					this.$store.state.remonCall = new Remon({ config });
+					this.$store.state.remonCall.connectCall(channel_id);
 					this.$store.state.isModalViewChat = true;
-				} else {
-					console.log('4. this._remonCall 여기안올껀디..');
+					// this.iscalltrying = true; //초기화
+				} else if (data.val().cancel === true) {
+					console.log('4. 상대방이 통화를 종료 하였습니다.');
+					// this.$store.state.isModalViewed = false;
+					this.$store.state.isModalViewChat = false;
+					// this.$store.state.remonCall.close();
+					starCountRef.off('value'); // 이렇게 하는게 맞는지 이 위치가 맞는지...
 				}
 			});
 		},

@@ -12,13 +12,8 @@ export default new Vuex.Store({
 		token: '',
 		toNickname: '',
 
-		// toState: '', //부재중/통화가능/통화중/OFF/통화일시정지중
-		// toIs: '', // ture,false : 통화가능 여부
-		// fromID: '',
-		// refresh: false,
-		// content_width: 0,
-		isModalViewChat: false,
-		isModalViewed: false,
+		isModalViewChat: false, //모달 채팅
+		isModalViewed: false, //모달 채팅 요청
 		channel_id: '',
 		roomid: 'roomid',
 		messageid: '',

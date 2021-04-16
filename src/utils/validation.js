@@ -6,3 +6,7 @@ export function validateEmail(value) {
 export function validatePassword(value) {
 	return value.length >= 4;
 }
+
+export function validateNickname(value) {
+	return value.length >= 4;
+}

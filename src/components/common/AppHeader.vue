@@ -1,7 +1,7 @@
 <template>
-	<header :class="{ fixed: isFixed }" ref="appHeader">
+	<header id="header" :class="{ fixed: isFixed }" ref="appHeader">
 		<div>
-			<router-link to="/main" class="logo">
+			<router-link to="/" class="logo">
 				TIL
 				<span v-if="isLoggedIn">by {{ this.$store.state.nickname }}</span>
 			</router-link>
@@ -13,6 +13,21 @@
 			</template>
 			<template v-else>
 				<a href="javascript:;" @click="logout" class="logout-button">Logout</a>
+				<a href="javascript:;" @click="showModal = true" class="logout-button">마이페이지</a>
+				<Modal2 v-if="showModal" @close="showModal = false">
+					<h3 slot="header">마이페이지 <button class="modal-default-button" @click="showModal = false">X</button></h3>
+					<div slot="body">
+						<h3>정보수정</h3>
+						<div>사진정보</div>
+						<h3>지역확인</h3>
+						<select
+							><option>서울</option
+							><option>서울</option></select
+						>
+					</div>
+
+					<h3 slot="footer"></h3>
+				</Modal2>
 			</template>
 		</div>
 	</header>
@@ -21,8 +36,12 @@
 <script>
 import { mapGetters } from 'vuex';
 import bus from '@/utils/bus';
+import Modal2 from '@/components/common/Modal2.vue';
 
 export default {
+	components: {
+		Modal2,
+	},
 	computed: {
 		...mapGetters(['isLoggedIn']),
 	},
@@ -30,6 +49,7 @@ export default {
 		return {
 			navHeight: 0,
 			isFixed: false,
+			showModal: false,
 		};
 	},
 	watch: {

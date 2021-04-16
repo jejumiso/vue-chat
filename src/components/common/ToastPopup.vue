@@ -49,18 +49,13 @@ export default {
 				.child('chat_messages/' + _roomid + '/' + _messageid);
 			const listener = {
 				async onConnect(channelId) {
-					// myChannelId = channelId;
-					console.log('2. remon onConnect');
 					console.log('2. remon onConnect' + channelId);
-					console.log('2. remon onConnect' + _roomid);
-					console.log('2. remon onConnect' + _messageid);
-					// this.remon_onConnect(_roomid, _messageid);
 
 					await messagei3d.update({
 						isReceiver: true,
 						isCaller: false,
 						str_sdate: 'onConnect',
-						str_edate: 'onConnect',
+						str_edate: '',
 					});
 
 					messagei3d.onDisconnect().update({
@@ -92,10 +87,10 @@ export default {
 
 			//caller.listener.onConnect(this.$store.state.channel_i);
 			this.$store.state.remonCall.connectCall(this.$store.state.channel_id);
-			console.log('9. this.$store.state.remonCall : ' + this.$store.state.remonCall);
+			// console.log('9. this.$store.state.remonCall : ' + this.$store.state.remonCall);
 		},
 		async remon_onConnect(roomid, messageid) {
-			console.log('77777777777. roomid, messageid : ' + roomid);
+			// console.log('77777777777. roomid, messageid : ' + roomid);
 			await this.$firebase
 				.database()
 				.ref()
@@ -103,8 +98,8 @@ export default {
 				.update({
 					isReceiver: true,
 					isCaller: false,
-					str_sdate: 'onConnect',
-					str_edate: 'onConnect',
+					str_sdate: '시작시간',
+					str_edate: '',
 				});
 		},
 		showToast(message) {

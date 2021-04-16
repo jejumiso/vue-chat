@@ -162,7 +162,7 @@ export default {
 					this.$router.push('/');
 					this.initForm();
 				} else {
-					bus.$emit('show:toast', '등록된 사용자가 없습니다.');
+					bus.$emit('show:toast', '로그인 정보가 없습니다.');
 				}
 			} catch (error) {
 				console.log('에러 : ' + error);

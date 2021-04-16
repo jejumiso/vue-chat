@@ -1,15 +1,17 @@
 <template>
 	<div class="app">
 		<VideoChat_M v-if="this.$store.state.isModalViewChat"></VideoChat_M>
-		<div id="content" v-else style="width:100%;max-width:1200px;margin:0 auto">
+		<div id="content" v-else style="width:100%;max-width:1200px;margin:0 auto;background-color: white;min-height:100%;">
 			<AppHeader></AppHeader>
 			<div class="app-contents">
-				<router-view></router-view>
+				<transition name="fade">
+					<router-view></router-view>
+				</transition>
 			</div>
 			<AppFooter></AppFooter>
 			<ToastPopup></ToastPopup>
 		</div>
-		<ModalTrayChat></ModalTrayChat>
+		<ModalTrayChat v-if="$store.state.isModalViewed"></ModalTrayChat>
 	</div>
 </template>
 
@@ -72,7 +74,6 @@ export default {
 			// });
 
 			starCountRef.on('child_added', data => {
-				console.log('2222. ' + this.$store.state.nickname);
 				if (data.val().lastUpdateMember !== this.$store.state.nickname) {
 					// if (data.val().disabled === false) {
 					// 	bus.$emit('show:toast_oncall', data.val().nickname, '요청이 들어왔습니다.', 20000, true);
@@ -128,4 +129,21 @@ export default {
 <style>
 @import './assets/css/reset.css';
 @import './assets/css/common.css';
+.fade-enter-active,
+.fade-leave-active {
+	transition-property: opacity;
+	transition-duration: 0.25s;
+}
+
+.fade-enter-active {
+	transition-delay: 0.25s;
+}
+
+.fade-enter,
+.fade-leave-active {
+	opacity: 0;
+}
+.app {
+	background-color: rgba(100, 100, 100, 0);
+}
 </style>

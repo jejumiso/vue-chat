@@ -63,11 +63,25 @@ export default {
 
 		// 	remonCall.connectCall('CHANNEL_ID');
 		// },
-		remon_unclick() {
-			console.log('end~ . this.$store.state.remonCall : ' + this.$store.state.remonCall);
+		async remon_unclick() {
+			console.log('end~ . remon_unclick : ' + this.$store.state.remonCall);
 
 			this.$store.state.remonCall.close();
 			this.$store.state.isModalViewChat = false;
+			let _roomid = this.$store.state.roomid;
+			let _messageid = this.$store.state.messageid;
+			let _nickname = this.$store.state.nickname;
+			await this.$firebase
+				.database()
+				.ref()
+				.child('chat_messages/' + _roomid + '/' + _messageid)
+				.update({
+					str_edate: '종료시간',
+					total_sencond: 100,
+					cancel: true,
+					cancelstr: '통화종료클릭',
+					cancelUser: _nickname,
+				});
 		},
 		remon() {
 			console.log('레몬');

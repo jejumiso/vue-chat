@@ -54,7 +54,6 @@ export default {
 			bj_height: 0,
 			isModalViewed: false,
 			keyvalue: '',
-			iscalltrying: false,
 			// to_nickname: '',
 			roomid: '',
 		};
@@ -217,7 +216,6 @@ export default {
 				.update({
 					nickname: _nickname,
 				});
-			this.iscalltrying = true;
 		},
 		// async cancel_call() {
 		// 	this.$store.state.toNickname = '';
@@ -244,14 +242,15 @@ export default {
 		// },
 		async ModalPopup(_toNickname) {
 			var _nickname = this.$store.state.nickname;
-			if (_nickname !== _toNickname) {
+			if (_nickname === '') {
+				bus.$emit('show:toast', '로그인 후 이용 가능 합니다.');
+			} else if (_nickname !== _toNickname) {
 				//초기화
-				this.iscalltrying = false;
 
 				//[1] 상대방이 통화중이거나 부재중인지 확인.
 				//[1-1] 채팅 리스트에 없으면 offline
 				//[1-1] 채팅 리스트에 있으면 online  통화중인지..수신거부중인지 등 확이
-				console.log('starCountRef nickname : ' + _toNickname);
+				// console.log('starCountRef nickname : ' + _toNickname);
 				var starCountRef = this.$firebase
 					.database()
 					.ref()
@@ -267,7 +266,7 @@ export default {
 							const data = snapshot.val();
 
 							if (!data) {
-								bus.$emit('show:toast', _toNickname + '님은 offline입니다.');
+								// bus.$emit('show:toast', _toNickname + '님은 offline입니다.');
 							} else {
 								if (data.onlineState) {
 									is = true;
@@ -277,14 +276,13 @@ export default {
 								}
 							}
 						} else {
-							console.log('No data available');
+							bus.$emit('show:toast', _toNickname + '님은 offline입니다.');
 						}
 					})
 					.catch(function(error) {
 						console.error('error             1234   :      ' + error);
 					});
 				this.$store.state.isModalViewed = is;
-				console.log('this.isModalViewed = is ~~~~~~~~: 모달 : ' + this.isModalViewed);
 				this.$store.state.toNickname = _toNickname;
 			} else {
 				bus.$emit('show:toast', '본인에게는 요청 할 수 없어요.');

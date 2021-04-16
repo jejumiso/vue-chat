@@ -3,7 +3,7 @@
 		<div class="form-wrapper form-wrapper-sm">
 			<PageHeader>회원가입</PageHeader>
 			<form @submit.prevent="registerUser" class="form">
-				<div>
+				<!-- <div>
 					<label for="username">ID</label>
 					<input type="text" id="username" v-model="username" :class="usernameValidClass" />
 					<p class="validation-text">
@@ -11,20 +11,26 @@
 							Please enter an email address
 						</span>
 					</p>
-				</div>
+				</div> -->
 				<div>
-					<label for="password">PW</label>
-					<input type="password" id="password" v-model="password" :class="passwordValidClass" />
+					<label for="nickname">닉네임 (id로 이용 됩니다.)</label>
+					<input type="text" id="nickname" v-model="nickname" :class="nicknameValidClass" />
 					<p class="validation-text">
-						<span class="warning" v-if="!isPasswordValid">
-							Password must be over 8 letters
+						<span class="warning" v-if="!isUsernameValid">
+							4자 이상 입력 하여 주세요.
 						</span>
 					</p>
 				</div>
 				<div>
-					<label for="nickname">Nickname</label>
-					<input type="text" id="nickname" v-model="nickname" :class="nicknameValidClass" />
+					<label for="password">비밀번호</label>
+					<input type="password" id="password" v-model="password" :class="passwordValidClass" />
+					<p class="validation-text">
+						<span class="warning" v-if="!isPasswordValid">
+							8자 이상 입력 하여 주세요.
+						</span>
+					</p>
 				</div>
+
 				<button type="submit" class="btn" :class="isButtonDisabled" :disabled="isButtonDisabled">
 					가입
 				</button>
@@ -60,7 +66,7 @@
 
 <script>
 import { signupUser } from '@/api/auth';
-import { validateEmail, validatePassword } from '@/utils/validation';
+import { validateNickname, validatePassword } from '@/utils/validation';
 import PageHeader from './common/PageHeader.vue';
 
 export default {
@@ -77,16 +83,16 @@ export default {
 	},
 	computed: {
 		usernameValidClass() {
-			if (!this.username) {
+			if (!this.nickname) {
 				return;
 			}
-			return validateEmail(this.username) ? 'valid' : 'invalid';
+			return validateNickname(this.nickname) ? 'valid' : 'invalid';
 		},
 		isUsernameValid() {
-			if (!this.username) {
+			if (!this.nickname) {
 				return true;
 			}
-			return validateEmail(this.username);
+			return validateNickname(this.nickname);
 		},
 		passwordValidClass() {
 			if (!this.password) {
@@ -104,19 +110,24 @@ export default {
 			return this.nickname ? 'valid' : null;
 		},
 		isButtonDisabled() {
-			return !this.username || !this.password || !this.nickname || !validateEmail(this.username) || !validatePassword(this.password) ? 'disabled' : null;
+			return !this.password || !this.nickname || !validateNickname(this.nickname) || !validatePassword(this.password) ? 'disabled' : null;
 		},
 	},
 	methods: {
 		async registerUser() {
 			try {
-				await signupUser({
+				this.logMessage = '';
+				const response = await signupUser({
 					teamName: this.$store.state.teamName,
 					password: this.password,
 					nickname: this.nickname,
 				});
-				this.logMessage = '가입이 완료 되었습니다.';
-				this.initForm();
+				if (response.data.error === '' || response.data.error === null) {
+					this.logMessage = '가입이 완료 되었습니다.';
+					this.initForm();
+				} else {
+					this.logMessage = `${response.data.error}`;
+				}
 			} catch (error) {
 				console.log(error.response);
 				if (error.response.status === 409) {
