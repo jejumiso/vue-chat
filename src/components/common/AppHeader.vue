@@ -46,12 +46,12 @@ export default {
 					onlineState: false,
 					status: 'logout',
 				});
-			this.$store.state.loginOnOffRef.onDisconnect().cancel();
+			// this.$store.state.loginOnOffRef.onDisconnect().cancel();
 			this.$store.state.loginOnOffRef = '';
 
 			bus.$emit('show:toast', '로그아웃.');
 			this.$store.commit('LOGOUT');
-			// this.$router.push('/');
+			this.$router.push('/login');
 		},
 		checkHeight() {
 			window.scrollY > 5 ? this.stickHeader() : this.looseHeader();

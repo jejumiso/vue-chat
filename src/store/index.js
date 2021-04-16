@@ -38,7 +38,7 @@ export default new Vuex.Store({
 			},
 		},
 		listener: '',
-		loginOnOff: '',
+		loginOnOffRef: '',
 	},
 	getters: {
 		isLoggedIn(state) {
@@ -52,7 +52,7 @@ export default new Vuex.Store({
 		SET_USER(state, user) {
 			state.user = user;
 			state.nickname = user.nickname;
-			console.log('state.SET_USER : ');
+			// console.log('state.SET_USER : ');
 		},
 		SET_TOKEN(state, token) {
 			state.token = token;
@@ -70,9 +70,9 @@ export default new Vuex.Store({
 		async LOGIN({ commit }, data) {
 			const response = await loginUser(data);
 			if (response.data != '') {
-				console.log('store.LOGIN : ' + response.data.nickname);
-				commit('SET_USER', response.data);
-				commit('SET_TOKEN', response.data.nickname);
+				// console.log('store.LOGIN : ' + response.data.nickame);
+				commit('SET_USER', response.data); //$store저장
+				commit('SET_TOKEN', response.data.nickname); //$store저장
 				saveUserToCookie(response.data.nickname);
 				saveAuthToCookie(response.data.nickname);
 				return response;

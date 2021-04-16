@@ -57,26 +57,6 @@ export default {
 				onlineState: false,
 				status: 'offline',
 			});
-
-			// var my_nickname = this.$store.state.nickname;
-			// var starCountRef = this.$firebase
-			// 	.database()
-			// 	.ref()
-			// 	.child('users/' + my_nickname);
-			// starCountRef.update({
-			// 	onlineState: true,
-			// 	status: 'online',
-			// });
-			// starCountRef.onDisconnect().update({
-			// 	onlineState: false,
-			// 	status: 'offline',
-			// });
-			// starCountRef.onDisconnect().set(false);
-			// starCountRef.onDisconnect().cancel();
-			// starCountRef.onDisconnect().update({
-			// 	onlineState: false,
-			// 	status: '2222',
-			// });
 		},
 		//전화요청이 들어 오는것에 대해서...
 		OnCall() {
@@ -135,12 +115,12 @@ export default {
 	},
 	mounted() {
 		if (this.isLoggedIn) {
-			console.log('로그인되었네요..');
 			this.OnCall();
-			this.OnandOff();
-		} else {
-			console.log('로그아웃상태입니다.');
+			this.OnandOff(); // 로그인을 하고 새로 고침을 했을 경우 대비....
 		}
+	},
+	updated() {
+		// console.log('222222222222222.APP...  updated..');
 	},
 };
 </script>
