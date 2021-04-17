@@ -2,7 +2,7 @@
 	<!-- https://hasudoki.tistory.com/entry/Vuejs-%EB%AA%A8%EB%8B%AC-%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8Modal-Component-%EB%A7%8C%EB%93%A4%EA%B8%B0 -->
 	<div class="modal">
 		<div class="overlay" @click="$emit('close-modal')"></div>
-		<div class="modal-card">
+		<div class="modal-card" style="width:100%;max-width:1200px;margin:0 auto;background-color: white;min-height:100%;">
 			<h6>모달입니다.</h6>
 			<slot />
 		</div>

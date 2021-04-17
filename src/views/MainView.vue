@@ -1,11 +1,14 @@
 <template>
 	<div>
+		<AppHeader></AppHeader>
+		<BestBj></BestBj>
 		<div class="main list-container contents">
-			<PageHeader>Today I Learned</PageHeader>
-			<ul v-if="postItems">
+			<!-- <ul v-if="postItems">
 				<li v-for="item in postItems" :key="item._id">
 					<div class="post-title">
-						<router-link :to="`/post/${item._id}`">{{ item.title }}</router-link>
+						<router-link :to="`/post/${item._id}`">{{
+							item.title
+						}}</router-link>
 					</div>
 					<div class="post-contents">
 						{{ item.contents }}
@@ -16,60 +19,22 @@
 						<i class="icon ion-md-trash" @click="removePost(item._id)"></i>
 					</div>
 				</li>
-			</ul>
-			<LoadingSpinner v-else></LoadingSpinner>
+			</ul> -->
 		</div>
-		<CreateButton></CreateButton>
+		<AppFooter></AppFooter>
 	</div>
 </template>
 
 <script>
-import PageHeader from '@/components/common/PageHeader.vue';
-import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
-import CreateButton from '@/components/common/CreateButton.vue';
-import { fetchPosts, deletePostById } from '@/api/posts.js';
-import bus from '@/utils/bus.js';
+import BestBj from '@/components/BestBj.vue';
+import AppHeader from '@/components/common/AppHeader.vue';
+import AppFooter from '@/components/common/AppFooter.vue';
 
 export default {
 	components: {
-		CreateButton,
-		PageHeader,
-		LoadingSpinner,
-	},
-	data() {
-		return {
-			postItems: null,
-		};
-	},
-	methods: {
-		async fetchData() {
-			try {
-				const {
-					data: { posts: postItems },
-				} = await fetchPosts();
-				this.postItems = postItems;
-				return;
-			} catch (error) {
-				console.log(error);
-			}
-		},
-		editPost(id) {
-			this.$router.push(`/post/${id}`);
-		},
-		async removePost(id) {
-			try {
-				if (confirm('Delete it?')) {
-					const response = await deletePostById(id);
-					await this.fetchData();
-					bus.$emit('show:toast', `${response.data.title} was deleted`);
-				}
-			} catch (error) {
-				// console.log(error);
-			}
-		},
-	},
-	created() {
-		this.fetchData();
+		BestBj,
+		AppHeader,
+		AppFooter,
 	},
 };
 </script>

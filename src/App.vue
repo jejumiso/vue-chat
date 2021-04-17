@@ -2,13 +2,11 @@
 	<div class="app">
 		<VideoChat_M v-if="this.$store.state.isModalViewChat"></VideoChat_M>
 		<div id="content" v-else style="width:100%;max-width:1200px;margin:0 auto;background-color: white;min-height:100%;">
-			<AppHeader></AppHeader>
 			<div class="app-contents">
 				<transition name="fade">
 					<router-view></router-view>
 				</transition>
 			</div>
-			<AppFooter></AppFooter>
 			<ToastPopup></ToastPopup>
 		</div>
 		<ModalTrayChat v-if="$store.state.isModalViewed"></ModalTrayChat>
@@ -17,10 +15,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import AppHeader from './components/common/AppHeader.vue';
 import ModalTrayChat from './components/common/ModalTrayChat.vue';
 import VideoChat_M from './components/common/VideoChat_M.vue';
-import AppFooter from './components/common/AppFooter.vue';
 import ToastPopup from './components/common/ToastPopup.vue';
 import bus from '@/utils/bus.js';
 // import bus from '@/utils/bus.js';
@@ -37,9 +33,7 @@ export default {
 	components: {
 		VideoChat_M,
 		ModalTrayChat,
-		AppHeader,
 		ToastPopup,
-		AppFooter,
 	},
 	methods: {
 		//로그아웃이나 창을 끌 경우 오프라인 처리..

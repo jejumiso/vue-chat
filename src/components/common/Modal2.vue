@@ -5,7 +5,7 @@
 				<div class="modal-container" style="width:100%;max-width:1200px;margin:0 auto;background-color: white;min-height:100%;">
 					<div class="modal-header">
 						<slot name="header">
-							default header
+							기본값 헤더
 						</slot>
 					</div>
 

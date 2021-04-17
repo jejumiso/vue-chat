@@ -1,8 +1,9 @@
 <template>
 	<div>
-		<a href="/">홈</a>
+		안쓰는page
+		<!-- <a href="/">홈</a>
 
-		마이페이지
+		마이페이지 -->
 	</div>
 </template>
 
@@ -11,7 +12,7 @@ export default {};
 </script>
 
 <style scoped>
-header#header {
+#content > header#header {
 	display: none;
 }
 </style>
