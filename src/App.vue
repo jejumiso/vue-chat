@@ -3,9 +3,7 @@
 		<VideoChat_M v-if="this.$store.state.isModalViewChat"></VideoChat_M>
 		<div id="content" v-else style="width:100%;max-width:1200px;margin:0 auto;background-color: white;min-height:100%;">
 			<div class="app-contents">
-				<transition name="fade">
-					<router-view></router-view>
-				</transition>
+				<router-view></router-view>
 			</div>
 			<ToastPopup></ToastPopup>
 		</div>

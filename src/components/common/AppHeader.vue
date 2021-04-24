@@ -1,5 +1,5 @@
 <template>
-	<header id="header" :class="{ fixed: isFixed }" ref="appHeader">
+	<header id="header" :class="{ fixed: false }" ref="appHeader">
 		<div>
 			<router-link to="/" class="logo">
 				TIL
@@ -18,7 +18,7 @@
 					<h3 slot="header">마이페이지 <button class="modal-default-button" @click="showModal = false">X</button></h3>
 					<div slot="body">
 						<h3>정보수정</h3>
-						<div>사진정보</div>
+						<div><router-link to="/profile">사진정보</router-link></div>
 						<h3>지역확인</h3>
 						<select
 							><option>서울</option
@@ -131,6 +131,7 @@ a.logo {
 	position: fixed;
 	top: 0;
 	width: 100%;
+	max-width: 1200px;
 }
 .add-button {
 	background: #3ca776;

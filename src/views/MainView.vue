@@ -2,31 +2,14 @@
 	<div>
 		<AppHeader></AppHeader>
 		<BestBj></BestBj>
-		<div class="main list-container contents">
-			<!-- <ul v-if="postItems">
-				<li v-for="item in postItems" :key="item._id">
-					<div class="post-title">
-						<router-link :to="`/post/${item._id}`">{{
-							item.title
-						}}</router-link>
-					</div>
-					<div class="post-contents">
-						{{ item.contents }}
-					</div>
-					<div class="post-time">
-						{{ item.createdAt | formatDate }}
-						<i class="icon ion-md-create" @click="editPost(item._id)"></i>
-						<i class="icon ion-md-trash" @click="removePost(item._id)"></i>
-					</div>
-				</li>
-			</ul> -->
-		</div>
+		<RankBj></RankBj>
 		<AppFooter></AppFooter>
 	</div>
 </template>
 
 <script>
 import BestBj from '@/components/BestBj.vue';
+import RankBj from '@/components/RankBj.vue';
 import AppHeader from '@/components/common/AppHeader.vue';
 import AppFooter from '@/components/common/AppFooter.vue';
 
@@ -35,6 +18,7 @@ export default {
 		BestBj,
 		AppHeader,
 		AppFooter,
+		RankBj,
 	},
 };
 </script>

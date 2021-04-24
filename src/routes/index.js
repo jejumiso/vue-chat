@@ -10,6 +10,7 @@ import store from '../store';
 // import VideoChatView from '../views/VideoChatView';
 import VideoChatView_M from '../views/VideoChatView_M';
 import MyPage from '../views/MyPage';
+import Profile from '@/views/Profile';
 
 Vue.use(Router);
 
@@ -32,6 +33,11 @@ export default new Router({
 			path: '/videochat_m',
 			name: 'videochat_m',
 			component: VideoChatView_M,
+		},
+		{
+			path: '/profile',
+			name: 'profile',
+			component: Profile,
 		},
 		{
 			path: '/MyPage',
